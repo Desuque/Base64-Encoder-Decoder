@@ -214,6 +214,17 @@ void decode(char *cadenaBase64, char *CadenaDecodificada) {
 	}
 }
 
+void grabarArchivo(char *nombreArchivo, char* cadena) {
+	FILE *fp;
+	fp = fopen(nombreArchivo, "w+");        
+	if (fp == NULL) {
+		fputs ("Error abriendo el archivo.",stderr);
+		exit (1);
+	} 	
+ 	fputs(cadena, fp);
+	fclose (fp);
+}
+
 int main (int argc, char *argv[]) {
 	/*char ejemplo[2] = "Ma";
 	char CadenaBit[24] = "";
@@ -244,42 +255,49 @@ int main (int argc, char *argv[]) {
 	bufferClose(bf);
 	//BinaryToDecimal(&(CadenaBit[0]));
 	**/
-	
+
 	char *CadenaDecodificada;
 	int c;
-	while ((c = getopt (argc, argv, "h:V:a:")) != -1) {
+	while ((c = getopt (argc, argv, "h:V:a:o:")) != -1) {
 		static struct option long_options[] = {
-				{"help", no_argument, 0, 'h'},
 				{"version",  no_argument, 0, 'V'},
+				{"help", no_argument, 0, 'h'},
+				{"input",  optional_argument, 0, 'i'},
+				{"output",  optional_argument, 0, 'o'},
 				{"action",  optional_argument, 0, 'a'},
 				{0, 0, 0, 0}
 		};
 		const char *tmp_optarg = optarg;
 		switch (c) {
-			case 'h':
-				help();
-				break;
 			case 'V':
 				version();
 				break;
+			case 'h':
+				help();
+				break;
+			case 'i':
+				//TODO
+				break;
 			case 'o':
-
+        		if(CadenaDecodificada != 0) {
+					if(strlen(optarg) != 0) {
+						grabarArchivo(optarg, CadenaDecodificada);	
+					}
+				}
 				break;
 			case 'a':
 				if(strcmp(optarg, "decode") == 0) {
 					//ACORDATE QUE TIENE QUE SER CANT CARACTERES + 1!!!
 					char cadena[13] = "cGxlYXN1cmUu";
 					CadenaDecodificada = calloc(2, ((strlen(cadena)*sizeof(char)*6)/8));
-					
-					printf("A ver cuanto: %d", (int)strlen(cadena));
-					decode(cadena, CadenaDecodificada); //hay que pasar el stdin o arch
+					decode(cadena, CadenaDecodificada);
 
-					printf("Texto: %s", CadenaDecodificada);
+					//hay que pasar el stdin o arch
+					printf("Texto decodificado: %s \n", CadenaDecodificada);
 				}
 				else if(strcmp(optarg, "encode") == 0) {
 					printf("Hay que codificar");
 				}
-
         		break;
 			case '?':
 				break;
