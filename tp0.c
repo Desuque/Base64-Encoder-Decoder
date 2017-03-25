@@ -274,7 +274,7 @@ int main (int argc, char *argv[]) {
 
 
 	//Cargo el buffer con posibles caracteres ingresados por Stdin
-	char *buffer = NULL;
+	//char *buffer = NULL;
 	//setStdinBuffer(buffer);
 
 	//printf("A ver: %s", buffer);
@@ -316,11 +316,17 @@ int main (int argc, char *argv[]) {
 			case 'a':
 				if(optarg != 0) {
 					if(strcmp(optarg, "decode") == 0) {
-						if(buffer != NULL) {
+						//if(buffer != NULL) {
+							char buffer[365] = "TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlz"
+"IHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2Yg"
+"dGhlIG1pbmQsIHRoYXQgYnkgYSBwZXJzZXZlcmFuY2Ugb2YgZGVsaWdodCBpbiB0aGUgY29udGlu"
+"dWVkIGFuZCBpbmRlZmF0aWdhYmxlIGdlbmVyYXRpb24gb2Yga25vd2xlZGdlLCBleGNlZWRzIHRo"
+"ZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=";
+
 							printf("Buffer: %s", buffer);
 							CadenaDecodificada = calloc(2, ((strlen(buffer)*sizeof(char)*6)/8));
 							decode(buffer, CadenaDecodificada);
-						}
+						//}
 						//TODO ARCHIVO
 						//hay que pasar el stdin o arch
 						printf("Texto decodificado: %s \n", CadenaDecodificada);
