@@ -158,6 +158,62 @@ char* bufferOpen(int size){
 void bufferClose(char* bf){
 	free(bf);
 }
+
+
+void PosicionToBinary(int posicion, char *CadenaBit) {
+	char cadenaAuxiliar[8] = "";
+	int j=0;
+    for (int i = 7; i >= 0; --i)
+    {
+    	//Las cadenas en base64 son de 6 bits, los dos primeros ceros no me interesan
+    	if((j != 0) && (j != 1)) {
+    		cadenaAuxiliar[j-2] = ((posicion & (1 << i)) ? '1' : '0' );	
+    	}
+    	j++;
+    }
+    strcat(CadenaBit, cadenaAuxiliar);	
+}
+
+int decodeBase64(char caracter) {
+	//REVISAR CASO DEL IGUAL, HACER CASO DE BORDE
+	char code[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+	for(unsigned int i=0; i<strlen(code); i++) {
+		if(caracter == code[i]) {
+			return i;
+			break;
+		}
+	}
+}
+
+void decode(char *cadenaBase64, char *CadenaDecodificada) {
+	char *CadenaBits;
+	//Reservo memoria para almacenar la cadena binaria
+	CadenaBits = calloc(2, strlen(cadenaBase64)*sizeof(char)*6);
+	
+	//Traduzco cada caracter base64 a binario
+	for(unsigned int i=0; i<strlen(cadenaBase64); i++) {
+		char cadenaAuxiliar[6] = "";
+		PosicionToBinary(decodeBase64(cadenaBase64[i]), cadenaAuxiliar);
+		strcat(CadenaBits, cadenaAuxiliar);
+	}
+
+	//Traduzco la cadena binaria a texto
+	char cadenaAuxiliar[8] = "";
+	int i = 0;
+	int k = 0;
+	while(i < strlen(CadenaBits)) {
+		for(unsigned int j=0; j<8; j++) {
+			cadenaAuxiliar[j] = CadenaBits[i];
+			i++;	
+		}
+		char c = strtol(cadenaAuxiliar, 0, 2);
+		if(strlen(&c) != 0) {
+			CadenaDecodificada[k] = c;
+			k++;
+		}
+	}
+}
+
 int main (int argc, char *argv[]) {
 	/*char ejemplo[2] = "Ma";
 	char CadenaBit[24] = "";
@@ -166,6 +222,12 @@ int main (int argc, char *argv[]) {
 	}
 
 	printf("El largo de CadenaBit es:%d\n", (int)strlen(CadenaBit));*/
+	
+	/**
+	NOTA CRISTIAN: TE COMENTO LO TUYO PARA PODER PROBAR
+	LOS ARGUMENTOS REALES**/
+	
+	/**
 	for (size_t i = 0; i < argc; i++){
 		printf("Argumentos[%d] :%s\n",(int)i,argv[i]);
 	}
@@ -181,20 +243,18 @@ int main (int argc, char *argv[]) {
 	//BinaryToDecimal(bf);
 	bufferClose(bf);
 	//BinaryToDecimal(&(CadenaBit[0]));
-
+	**/
+	
+	char *CadenaDecodificada;
 	int c;
-
-	while (1) {
+	while ((c = getopt (argc, argv, "h:V:a:")) != -1) {
 		static struct option long_options[] = {
 				{"help", no_argument, 0, 'h'},
 				{"version",  no_argument, 0, 'V'},
+				{"action",  optional_argument, 0, 'a'},
 				{0, 0, 0, 0}
 		};
-		int option_index = 0;
-		c = getopt_long (argc, argv, "hVo:",
-                       long_options, &option_index);
-		if (c == -1)
-        break;
+		const char *tmp_optarg = optarg;
 		switch (c) {
 			case 'h':
 				help();
@@ -205,6 +265,22 @@ int main (int argc, char *argv[]) {
 			case 'o':
 
 				break;
+			case 'a':
+				if(strcmp(optarg, "decode") == 0) {
+					//ACORDATE QUE TIENE QUE SER CANT CARACTERES + 1!!!
+					char cadena[13] = "cGxlYXN1cmUu";
+					CadenaDecodificada = calloc(2, ((strlen(cadena)*sizeof(char)*6)/8));
+					
+					printf("A ver cuanto: %d", (int)strlen(cadena));
+					decode(cadena, CadenaDecodificada); //hay que pasar el stdin o arch
+
+					printf("Texto: %s", CadenaDecodificada);
+				}
+				else if(strcmp(optarg, "encode") == 0) {
+					printf("Hay que codificar");
+				}
+
+        		break;
 			case '?':
 				break;
 			default:
