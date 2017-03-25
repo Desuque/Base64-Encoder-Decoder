@@ -1,0 +1,117 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Definición del tipo de documento.                                           %
+% Posibles tipos de papel: a4paper, letterpaper, legalpapper                  %
+% Posibles tamaños de letra: 10pt, 11pt, 12pt                                 %
+% Posibles clases de documentos: article, report, book, slides                %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[a4paper,10pt]{article}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Los paquetes permiten ampliar las capacidades de LaTeX.                     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Paquete para inclusión de gráficos.
+\usepackage{graphicx}
+
+% Paquete para definir la codificación del conjunto de caracteres usado
+% (latin1 es ISO 8859-1).
+\usepackage[latin1]{inputenc}
+
+% Paquete para definir el idioma usado.
+\usepackage[spanish]{babel}
+
+
+% Título principal del documento.
+\title{		\textbf{Trabajo Práctico #0: Infraestructura básica}}
+
+% Información sobre los autores.
+\author{	Leandro Huemul Desuque, \textit{Padrón Nro. 95836}                     \\
+            \texttt{ desuqueleandro@gmail.com }                                              \\
+            Cristian, \textit{Padrón Nro. XXXXXX}                     \\
+            \texttt{ mail@mail.com }                                              \\[2.5ex]
+            \normalsize{1er. Cuatrimestre de 2017}                       \\
+            \normalsize{66.20 Organización de Computadoras}                             \\
+            \normalsize{Facultad de Ingeniería, Universidad de Buenos Aires}            \\
+       }
+\date{}
+
+
+
+\begin{document}
+
+% Inserta el título.
+\maketitle
+
+% Quita el número en la primer página.
+\thispagestyle{empty}
+
+% Resumen
+\begin{abstract}
+Se desarrolló un programa en C que codifica y decodifica información en formato base 64.
+El objetivo del presente trabajo fue familiarizarse con las herramientas básicas, tales como GXEmul y LaTeX.
+\end{abstract}
+
+\section{Introducción}
+Se implementó en C un codificador/decodificador de información en base 64.
+Base 64 es un sistema de numeración posicional que usa 64 como base. Es la mayor potencia de dos que puede ser representada usando únicamente los caracteres imprimibles de ASCII. Esto ha propiciado su uso para codificación de correos electrónicos, PGP y otras aplicaciones.
+Como puede entenderse, se trata de un sistema simple por lo que resulta una buena elección si el objetivo final no es construir un sistema elaborado sino familiarizarse con el software necesario para ello.
+
+% \textit{66.20 Organización de Computadoras} ESTO PONE TEXTO EN CURSIVA
+
+\section{Desarrollo}
+\subsection{Documentación del código C}
+La documentacion de las funciones se detalla por orden de aparición en el código fuente.
+
+\subsubsection{\texttt{help}}
+\texttt{help} despliega la ayuda para el usuario final.
+
+\subsubsection{\texttt{version}}
+\texttt{version} informa la version del código fuente.
+
+\subsubsection{\texttt{TODO}}
+\texttt{TODO} es una función que TODO.
+
+\subsubsection{\texttt{Especificaciones}}
+
+%\\begin{figure}[!htp]
+%\\begin{center}
+%\\includegraphics[width=0.4\textwidth]{imagenStack.eps}
+%\\end{center}
+%\\caption{Stack de la función vecinos} \label{fig:stack}
+%\\end{figure}
+
+FALTA, TODO.
+
+\subsection{Dificultades}
+FALTA, TODO.
+
+\section{Compilación}
+FALTA, TODO.
+
+Los argumentos utilizados para la compilación son los siguientes:
+
+\begin{description}
+\item[-c] Compila el código fuente pero no corre el linker. Genera el código objeto.
+
+\item[-o] Especifica el archivo de salida (ya sea un archivo objeto, ejecutable, ensamblado).
+
+\item[-Wall] Activa los mensajes de warning.
+
+\item[-I] Agrega el directorio especificado a la lista de directorios buscados para los archivos header
+\end{description}
+
+\section{Resultados}
+FALTA, TODO.
+
+\section{Conclusiones}
+FALTA, TODO.
+
+% Citas bibliográficas.
+\begin{thebibliography}{99}
+
+\bibitem{GXemul} Sitio web de GXemul http://gxemul.sourceforge.net/
+
+\end{thebibliography}
+
+\end{document}
