@@ -98,16 +98,89 @@ int BinaryToDecimal(char* cadenaParcial)//char* cadenaParcial)
   return 0;
 }
 
+FILE* fileOpen(char* nombre){
+	char modo[] = "rb"; //modo lectura binaria
+	FILE* fp =  fopen (nombre,modo);
+	if(fp == NULL){
+		printf("Error en abrir el archivo\n");
+		fclose(fp);
+		return NULL;
+	}
+	printf("Archivo '%s' abierto de manera exitosa\n", nombre);
+	return fp;
+}
+
+
+void fileClose(FILE* fp){
+	fclose(fp);
+}
+
+int fileGetSize(char* nombre){
+	printf("Obteniendo tamanio del archivo\n");
+	FILE* fp = fileOpen(nombre);
+	fseek(fp, 0L, SEEK_END);
+	int size = ftell(fp);
+	fseek(fp, 0L, SEEK_SET);
+	fileClose(fp);
+	printf("Size file:%d\n",size);
+	return size;
+}
+
+void fileRead(FILE* fp,char cadena[]){
+	printf("Leyendo archivo..\n");
+	int caracter;
+	int pos = 0;
+	while((cadena[pos] = fgetc(fp)) != EOF){
+		printf("%c.",cadena[pos]);
+		pos++;
+	}
+	printf("\n");
+	printf("Se termino de leer archivo\n");
+}
+
+void fileProcessing(char* nombre,char* buffer){
+	FILE* fp = fileOpen(nombre);
+	if (fp != NULL){
+		fileRead(fp,buffer);
+		fileClose(fp);
+	}
+}
+
+char* bufferOpen(int size){
+	printf("Estoy pidiendo:%d\n", (int)(sizeof(char)*size +1));
+	char* auxBf = malloc(sizeof(char)*size +1);
+	if (auxBf != NULL)
+		return auxBf;
+	printf("No se pudo obtener buffer..\n");
+	return NULL;
+}
+
+void bufferClose(char* bf){
+	free(bf);
+}
 int main (int argc, char *argv[]) {
-	char ejemplo[2] = "Ma";
+	/*char ejemplo[2] = "Ma";
 	char CadenaBit[24] = "";
 	for(unsigned int i=0; i<2; i++) {
 		CharToBinary(ejemplo[i], CadenaBit);
 	}
 
-	printf("El largo de CadenaBit es:%d\n", (int)strlen(CadenaBit));
+	printf("El largo de CadenaBit es:%d\n", (int)strlen(CadenaBit));*/
+	for (size_t i = 0; i < argc; i++){
+		printf("Argumentos[%d] :%s\n",(int)i,argv[i]);
+	}
 
-	BinaryToDecimal(&(CadenaBit[0]));
+	//dado que tengo un archivo, obtengo la cadena de caracteres
+	int size = fileGetSize(argv[4]);
+	char* bf = bufferOpen(size);
+	//char* bf[size+1] = ""
+	bf[size] = '\0';
+	fileProcessing(argv[4],bf);
+	printf("El buffer es:%s\n",bf); //valgrind me tira lectura invalida aca
+	printf("Tamanio del buffer:%d\n",(int)strlen(bf));
+	//BinaryToDecimal(bf);
+	bufferClose(bf);
+	//BinaryToDecimal(&(CadenaBit[0]));
 
 	int c;
 
