@@ -258,7 +258,7 @@ int main (int argc, char *argv[]) {
 
 	char *CadenaDecodificada;
 	int c;
-	while ((c = getopt (argc, argv, "h:V:a:o:")) != -1) {
+	while ((c = getopt (argc, argv, "V:h:i:o:a:")) != -1) {
 		static struct option long_options[] = {
 				{"version",  no_argument, 0, 'V'},
 				{"help", no_argument, 0, 'h'},
@@ -279,10 +279,14 @@ int main (int argc, char *argv[]) {
 				//TODO
 				break;
 			case 'o':
-        		if(CadenaDecodificada != 0) {
-					if(strlen(optarg) != 0) {
+				if(strlen(optarg) != 0) {
+        			if(CadenaDecodificada != 0) {
 						grabarArchivo(optarg, CadenaDecodificada);	
 					}
+					//FALTA IMPLEMENTAR -i
+					//if(CadenaCodificada != 0) {
+					//	grabarArchivo(optarg, CadenaCodificada);
+					//}
 				}
 				break;
 			case 'a':
