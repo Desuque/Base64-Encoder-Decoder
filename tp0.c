@@ -281,16 +281,21 @@ int main (int argc, char *argv[]) {
 
 	char *CadenaDecodificada;
 	int c;
-	while ((c = getopt (argc, argv, "Vhi:o:a:")) != -1) {
+	while (1) {
 		static struct option long_options[] = {
-				{"version",  no_argument, 0, 'V'},
+				{"version", no_argument, 0, 'V'},
 				{"help", no_argument, 0, 'h'},
-				{"input",  optional_argument, 0, 'i'},
-				{"output",  required_argument, 0, 'o'},
-				{"action",  optional_argument, 0, 'a'},
+				{"input", optional_argument, 0, 'i'},
+				{"output", required_argument, 0, 'o'},
+				{"action", optional_argument, 0, 'a'},
 				{0, 0, 0, 0}
 		};
-		const char *tmp_optarg = optarg;
+		int option_index = 0;
+ 		c = getopt_long (argc, argv, "Vhi:o:a:",
+ 	   	long_options, &option_index);
+		if (c == -1)
+		break;
+
 		switch (c) {
 			case 'V':
 				version();
