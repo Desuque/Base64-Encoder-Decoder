@@ -225,6 +225,22 @@ void grabarArchivo(char *nombreArchivo, char* cadena) {
 	fclose (fp);
 }
 
+void setStdinBuffer(char* buffer2) {
+    char *buffer = NULL;
+    int read;
+    long unsigned int len;
+    read = getline(&buffer, &len, stdin);
+    if (-1 != read) {
+    	buffer2 = calloc(1, strlen(buffer));
+    	strcpy(buffer2, buffer);
+        puts(buffer);
+    }
+    else
+        printf("No line read...\n");
+
+    printf("Size read: %d\n Len: %d\n", read, (int)len);
+}
+
 int main (int argc, char *argv[]) {
 	/*char ejemplo[2] = "Ma";
 	char CadenaBit[24] = "";
@@ -256,14 +272,21 @@ int main (int argc, char *argv[]) {
 	//BinaryToDecimal(&(CadenaBit[0]));
 	**/
 
+
+	//Cargo el buffer con posibles caracteres ingresados por Stdin
+	char *buffer = NULL;
+	//setStdinBuffer(buffer);
+
+	//printf("A ver: %s", buffer);
+
 	char *CadenaDecodificada;
 	int c;
-	while ((c = getopt (argc, argv, "V:h:i:o:a:")) != -1) {
+	while ((c = getopt (argc, argv, "Vhi:o:a:")) != -1) {
 		static struct option long_options[] = {
 				{"version",  no_argument, 0, 'V'},
 				{"help", no_argument, 0, 'h'},
 				{"input",  optional_argument, 0, 'i'},
-				{"output",  optional_argument, 0, 'o'},
+				{"output",  required_argument, 0, 'o'},
 				{"action",  optional_argument, 0, 'a'},
 				{0, 0, 0, 0}
 		};
@@ -279,27 +302,35 @@ int main (int argc, char *argv[]) {
 				//TODO
 				break;
 			case 'o':
-				if(strlen(optarg) != 0) {
-        			if(CadenaDecodificada != 0) {
-						grabarArchivo(optarg, CadenaDecodificada);	
-					}
-					//FALTA IMPLEMENTAR -i
-					//if(CadenaCodificada != 0) {
-					//	grabarArchivo(optarg, CadenaCodificada);
-					//}
+        		if(CadenaDecodificada != 0) {
+					grabarArchivo(optarg, CadenaDecodificada);	
+				}
+				//FALTA IMPLEMENTAR -i
+				//else if(CadenaCodificada != 0) {
+				//	grabarArchivo(optarg, CadenaCodificada);
+				//}
+				else {
+					printf("No hay informacion para persistir.\n");
 				}
 				break;
 			case 'a':
-				if(strcmp(optarg, "decode") == 0) {
-					//ACORDATE QUE TIENE QUE SER CANT CARACTERES + 1!!!
-					char cadena[13] = "cGxlYXN1cmUu";
-					CadenaDecodificada = calloc(2, ((strlen(cadena)*sizeof(char)*6)/8));
-					decode(cadena, CadenaDecodificada);
-
-					//hay que pasar el stdin o arch
-					printf("Texto decodificado: %s \n", CadenaDecodificada);
-				}
-				else if(strcmp(optarg, "encode") == 0) {
+				if(optarg != 0) {
+					if(strcmp(optarg, "decode") == 0) {
+						if(buffer != NULL) {
+							printf("Buffer: %s", buffer);
+							CadenaDecodificada = calloc(2, ((strlen(buffer)*sizeof(char)*6)/8));
+							decode(buffer, CadenaDecodificada);
+						}
+						//TODO ARCHIVO
+						//hay que pasar el stdin o arch
+						printf("Texto decodificado: %s \n", CadenaDecodificada);
+					} else if(strcmp(optarg, "encode") == 0) {
+						printf("Hay que codificar");
+					} else {
+						printf("No se reconoce el comando, por favor vea la ayuda.\n");
+					}
+				} else if (optarg == 0) {
+					//Por defecto codifica
 					printf("Hay que codificar");
 				}
         		break;
@@ -309,5 +340,12 @@ int main (int argc, char *argv[]) {
 				abort();
 		}
 	}
+
+/**
+	//Libero recursos
+	if (buffer != NULL) {
+		free(buffer);
+	}
+**/
 	return 0;
 }
