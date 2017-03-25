@@ -99,20 +99,13 @@ int BinaryToDecimal(char* cadenaParcial)//char* cadenaParcial)
 }
 
 int main (int argc, char *argv[]) {
-	//char ejemplo[3] = "Man";
 	char ejemplo[2] = "Ma";
 	char CadenaBit[24] = "";
 	for(unsigned int i=0; i<2; i++) {
-		//printf("Caracter: %s \n", &ejemplo[i]);
 		CharToBinary(ejemplo[i], CadenaBit);
-		//printf("Esta es la cadena parcial (?): %s\n", CadenaBit);
 	}
-	//printf("Esta es la cadena: %s\n", &(CadenaBit[0]));
 
 	printf("El largo de CadenaBit es:%d\n", (int)strlen(CadenaBit));
-	//for (size_t i = 0; i < strlen(CadenaBit); i++) {
-		//printf("CadenaBit[%d]: %s\n",(int)i ,&CadenaBit[i]);
-	//}
 
 	BinaryToDecimal(&(CadenaBit[0]));
 
