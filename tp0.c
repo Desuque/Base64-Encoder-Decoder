@@ -41,7 +41,6 @@ void CharToBinary(char c, char *CadenaBit)
 
 void encodeBase64(int posicion) {
 	char code[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-
 	char resultado = code[posicion];
 	printf("Encode: %c\n", resultado);
 }
@@ -61,7 +60,7 @@ int BinaryToDecimal(char* cadenaParcial)//char* cadenaParcial)
 		posicion = 0 ;
 		for(int j = 0 ; j < cantBitsEncode64 ; j++){
 			//se realiza un conversion directa, con '0' devuelve 48, por  eso se resta
-			printf("pos:%d\n",j+i*cantBitsEncode64);
+			//printf("pos:%d\n",j+i*cantBitsEncode64);
 			int aux = cadenaParcial[j+i*cantBitsEncode64] - codASCIIZero;
 			posicion = posicion << 1 | aux;
 		}
@@ -77,20 +76,27 @@ int BinaryToDecimal(char* cadenaParcial)//char* cadenaParcial)
 		posicion = 0;
 		for (size_t i = largoCadenaParcial- bitsSobrantes; i < largoCadenaParcial; i++){
 			int aux = cadenaParcial[i] - codASCIIZero;
-			printf("aux:%d\n",aux);
+			//printf("aux:%d\n",aux);
 			posicion = posicion << 1 | aux;
 		}
+		int cantidadDeBytesPorDecode = 4;
+		int cantidadDeLoopsCompletar4Bytes = cantidadDeBytesPorDecode - (cantidadCiclos + 1)%cantidadDeBytesPorDecode;
+		printf("Cantidad de loop's faltantes es:%d\n",cantidadDeLoopsCompletar4Bytes);
 		for (size_t i = 0; i < cantBitsEncode64 - bitsSobrantes; i++){
-			printf("aux:%d\n",0);
+			//printf("aux:%d\n",0);
 			posicion = posicion << 1 | 0;
 		}
-		printf("Decimal: %d\n", posicion);
+		if (posicion == 0){
+			posicion = 64;
+		}
 		encodeBase64(posicion);
+		posicion = 64;
+		for (size_t i = 0; i < cantidadDeLoopsCompletar4Bytes; i++) {
+			encodeBase64(posicion);
+		}
 	}
   return 0;
 }
-
-
 
 int main (int argc, char *argv[]) {
 	//char ejemplo[3] = "Man";
