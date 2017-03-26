@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
+#include <stdbool.h>
 
 void help() {
 	printf(	"Usage:\n"
@@ -255,6 +256,16 @@ void leerArchivo(char* nombreArchivo, char** bf) {
 
 }
 
+void setParametrosActivos(int argc, char *argv[], bool *oflag) {
+	//Seteo los parametros que estan activos
+	for (size_t i = 0; i < argc; i++){
+		if(argv[i] == "o" || argv[i] == "output") {
+			printf("Entre");
+			*oflag = true;
+		}
+	}
+}
+
 int main (int argc, char *argv[]) {
 	/*char ejemplo[2] = "Ma";
 	char CadenaBit[24] = "";
@@ -293,7 +304,9 @@ int main (int argc, char *argv[]) {
 	//printf("A ver: %s", buffer);
 
 	char **bufferArchivoEntrada;
-	char *CadenaDecodificada;
+	*bufferArchivoEntrada = NULL;
+	char *CadenaDecodificada = NULL;
+	bool oflag = false;
 	int c;
 	while (1) {
 		static struct option long_options[] = {
@@ -310,6 +323,7 @@ int main (int argc, char *argv[]) {
 		if (c == -1)
 		break;
 
+		setParametrosActivos(argc, argv, &oflag);
 		switch (c) {
 			case 'V':
 				version();
@@ -321,7 +335,7 @@ int main (int argc, char *argv[]) {
 				leerArchivo(optarg, bufferArchivoEntrada);
 				break;
 			case 'o':
-        		if(CadenaDecodificada != 0) {
+        		if(CadenaDecodificada != NULL) {
 					grabarArchivo(optarg, CadenaDecodificada);
 				}
 				//FALTA IMPLEMENTAR -i
