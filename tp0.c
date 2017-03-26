@@ -180,7 +180,7 @@ int decodeBase64(char caracter) {
 void decode(char *cadenaBase64, char *CadenaDecodificada) {
 	char *CadenaBits;
 	//Reservo memoria para almacenar la cadena binaria
-	CadenaBits = calloc(2, strlen(cadenaBase64)*sizeof(char)*6);
+	CadenaBits = malloc(strlen(cadenaBase64)*sizeof(char)*6+1);
 
 	//Traduzco cada caracter base64 a binario
 	for(unsigned int i=0; i<strlen(cadenaBase64); i++) {
@@ -335,12 +335,12 @@ int main (int argc, char *argv[]) {
 					if(strcmp(optarg, "decode") == 0) {
 						//Se ingreso la informacion a ser procesada por medio de un archivo
 						if(*bufferArchivoEntrada != NULL) {
-							CadenaDecodificada = calloc(1, ((strlen(*bufferArchivoEntrada)*sizeof(char)*6)/8));
+							CadenaDecodificada = malloc(((strlen(*bufferArchivoEntrada)*sizeof(char)*6)/8)+1);
 							decode(*bufferArchivoEntrada, CadenaDecodificada);
 
 							//Si no se especifica un archivo de salida, entonces se muestra por stdout
 							if(!oflag) {
-								fputs (CadenaDecodificada, stdout);
+								fputs(CadenaDecodificada, stdout);
 							}
 						}
 					} else if(strcmp(optarg, "encode") == 0) {
