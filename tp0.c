@@ -143,7 +143,7 @@ char* bufferOpen(int size){
 	printf("Open buffer[%d]\n",size);
 	char* auxBf = malloc(sizeof(char)*size);
 	if (auxBf != NULL)
-		auxBf[size-1] = '\0';
+		strcpy(auxBf,"");
 		printf("Buffer%s\n",auxBf);
 		return auxBf;
 	fputs ("No se pudo obtener buffer.\n", stderr);
@@ -182,13 +182,13 @@ int decodeBase64(char caracter) {
 	}
 }
 
-void decode(char *cadenaBase64, char *CadenaDecodificada) {
+void decode(char *cadenaBase64, char *CadenaDecodificada){
 	char *CadenaBits;
 	//Reservo memoria para almacenar la cadena binaria
 	CadenaBits = malloc(strlen(cadenaBase64)*sizeof(char)*6+1);
 
 	//Traduzco cada caracter base64 a binario
-	for(unsigned int i=0; i<strlen(cadenaBase64); i++) {
+	for(unsigned int i=0; i<strlen(cadenaBase64); i++){
 		char cadenaAuxiliar[6] = "";
 		PosicionToBinary(decodeBase64(cadenaBase64[i]), cadenaAuxiliar);
 		strcat(CadenaBits, cadenaAuxiliar);
@@ -268,11 +268,22 @@ void readSTDIN(char* bf,int size){
 	//if (!activeParameter(argc,argv,"i","--input")){
 		printf("Leyendo desde STDIN..\n");
 		//inputBuffer = bufferOpen(400);
-		printf("Cantidad de bytes leidos:%d\n",(int)read(0, bf, size));
+		printf("Cantidad de bytes leidos:%d\n",(int)read(0, bf, size)-1);
 		printf("Esto es la entrada%s\n",bf);
 	//}
 }
-void encode(char* c1,char* c2){}
+void encode(char* input,char* output){
+	printf("Strlen input:%d\n", (int)strlen(input));
+	int longitudBits = (strlen(input)-1)*8;
+	int longitud = longitudBits/6;
+	printf("longitud:%d\n",longitud);
+	if (longitudBits%6 != 0){
+		printf("longitud sobra bits:%d\n",longitud);
+		longitud++;
+	}
+	longitud = longitud + (4-longitud%4);
+	printf("La longitud:%d\n",longitud );
+}
 
 int main (int argc, char *argv[]) {
 	char* inputBuffer = NULL;
@@ -334,6 +345,7 @@ int main (int argc, char *argv[]) {
 
 	//llegado hasta aca el inputBuffer se leyo desde un archivo o desde stdin
 	if(stdin){
+		inputBuffer = bufferOpen(400);
 		printf("Input:STDIN\n");
 		readSTDIN(inputBuffer,400);
 	}else{
@@ -344,7 +356,7 @@ int main (int argc, char *argv[]) {
 	output = bufferOpen(((strlen(inputBuffer)*sizeof(char)*6)/8) + 1);
 	if (encode64){
 		printf("Encode..\n");
-		//encode(inputBuffer,output);
+		encode(inputBuffer,output);
 	}else{
 		printf("Decode..\n");
 		decode(inputBuffer,output);
