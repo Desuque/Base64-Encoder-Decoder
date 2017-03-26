@@ -124,12 +124,13 @@ int fileGetSize(char* nombre){
 	return size;
 }
 
-void fileRead(FILE* fp,char cadena[]){
+void fileRead(FILE* fp,char* buffer){
 	printf("Leyendo archivo..\n");
-	int caracter;
+	char caracter;
 	int pos = 0;
-	while((cadena[pos] = fgetc(fp)) != EOF){
-		printf("%c.",cadena[pos]);
+	while((caracter = fgetc(fp)) != EOF){
+		buffer[pos] = caracter;
+		//printf("%c.",buffer[pos]);
 		pos++;
 	}
 	printf("\n");
@@ -140,6 +141,8 @@ void fileProcessing(char* nombre, char* buffer){
 	FILE* fp = fileOpen(nombre);
 	if (fp != NULL){
 		fileRead(fp, buffer);
+		
+		printf("DEspues del fileREad: %s", buffer);
 		fileClose(fp);
 	}
 }
@@ -246,7 +249,7 @@ void leerArchivo(char* nombreArchivo, char *bf) {
 	//char* bf[size+1] = ""
 	bf[size] = '\0';
 	fileProcessing(nombreArchivo, bf);
-	printf("El buffer es:%s\n", bf); //valgrind me tira lectura invalida aca
+	printf("El buffer essssssssss:%s\n", bf); //valgrind me tira lectura invalida aca
 	printf("Tamanio del buffer:%d\n", (int)strlen(bf));
 	//BinaryToDecimal(bf);
 	
@@ -315,7 +318,9 @@ int main (int argc, char *argv[]) {
 				help();
 				break;
 			case 'i':
+				printf("Entre al i");
 				leerArchivo(optarg, bufferArchivoEntrada);
+						printf("FINAL: %s", bufferArchivoEntrada);
 				break;
 			case 'o':
         		if(CadenaDecodificada != 0) {
@@ -330,8 +335,18 @@ int main (int argc, char *argv[]) {
 				}
 				break;
 			case 'a':
+				printf("Entre al a");
+				printf("Buffer archivo entrada: %s", bufferArchivoEntrada);
 				if(optarg != 0) {
 					if(strcmp(optarg, "decode") == 0) {
+						if(bufferArchivoEntrada != NULL) {
+							//Se ingreso la informacion a ser procesada por medio de un archivo
+							CadenaDecodificada = calloc(1, ((strlen(bufferArchivoEntrada)*sizeof(char)*6)/8));
+							decode(bufferArchivoEntrada, CadenaDecodificada);
+
+							printf("Texto decodificado: %s \n", CadenaDecodificada);
+						}
+						/**	
 						//if(buffer != NULL) {
 							char buffer[365] = "TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlz"
 "IHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2Yg"
@@ -342,10 +357,10 @@ int main (int argc, char *argv[]) {
 							printf("Buffer: %s", buffer);
 							CadenaDecodificada = calloc(2, ((strlen(buffer)*sizeof(char)*6)/8));
 							decode(buffer, CadenaDecodificada);
+						**/
 						//}
 						//TODO ARCHIVO
 						//hay que pasar el stdin o arch
-						printf("Texto decodificado: %s \n", CadenaDecodificada);
 					} else if(strcmp(optarg, "encode") == 0) {
 						printf("Hay que codificar");
 					} else {
@@ -362,10 +377,10 @@ int main (int argc, char *argv[]) {
 				abort();
 		}
 	}
-
+/**
 	//Libero recursos
 	if (bufferArchivoEntrada != NULL) {
 		bufferClose(bufferArchivoEntrada);
-	}
+	}**/
 	return 0;
 }
