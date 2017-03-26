@@ -318,9 +318,7 @@ int main (int argc, char *argv[]) {
 				help();
 				break;
 			case 'i':
-				printf("Entre al i");
 				leerArchivo(optarg, bufferArchivoEntrada);
-						printf("FINAL: %s", *bufferArchivoEntrada);
 				break;
 			case 'o':
         		if(CadenaDecodificada != 0) {
@@ -335,36 +333,19 @@ int main (int argc, char *argv[]) {
 				}
 				break;
 			case 'a':
-				printf("Entre al a");
-				printf("Buffer archivo entrada: %s", *bufferArchivoEntrada);
 				if(optarg != 0) {
 					if(strcmp(optarg, "decode") == 0) {
+						//Se ingreso la informacion a ser procesada por medio de un archivo
 						if(*bufferArchivoEntrada != NULL) {
-							//Se ingreso la informacion a ser procesada por medio de un archivo
 							CadenaDecodificada = calloc(1, ((strlen(*bufferArchivoEntrada)*sizeof(char)*6)/8));
 							decode(*bufferArchivoEntrada, CadenaDecodificada);
 
-							printf("Texto decodificado: %s \n", CadenaDecodificada);
+							fputs (CadenaDecodificada, stdout);
 						}
-						/**
-						//if(buffer != NULL) {
-							char buffer[365] = "TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlz"
-"IHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2Yg"
-"dGhlIG1pbmQsIHRoYXQgYnkgYSBwZXJzZXZlcmFuY2Ugb2YgZGVsaWdodCBpbiB0aGUgY29udGlu"
-"dWVkIGFuZCBpbmRlZmF0aWdhYmxlIGdlbmVyYXRpb24gb2Yga25vd2xlZGdlLCBleGNlZWRzIHRo"
-"ZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=";
-
-							printf("Buffer: %s", buffer);
-							CadenaDecodificada = calloc(2, ((strlen(buffer)*sizeof(char)*6)/8));
-							decode(buffer, CadenaDecodificada);
-						**/
-						//}
-						//TODO ARCHIVO
-						//hay que pasar el stdin o arch
 					} else if(strcmp(optarg, "encode") == 0) {
 						printf("Hay que codificar");
 					} else {
-						printf("No se reconoce el comando, por favor vea la ayuda.\n");
+						fputs ("No se reconoce el comando, por favor lea la ayuda.\n", stderr);
 					}
 				} else if (optarg == 0) {
 					//Por defecto codifica
@@ -377,10 +358,11 @@ int main (int argc, char *argv[]) {
 				abort();
 		}
 	}
-/**
+
 	//Libero recursos
-	if (bufferArchivoEntrada != NULL) {
-		bufferClose(bufferArchivoEntrada);
-	}**/
+	if (*bufferArchivoEntrada != NULL) {
+		bufferClose(*bufferArchivoEntrada);
+	}
+
 	return 0;
 }
