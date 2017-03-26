@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <stdbool.h>
+#include <unistd.h>
 
 void help() {
 	printf(	"Usage:\n"
@@ -48,8 +49,7 @@ void encodeBase64(int posicion) {
 
 //Convierto la cadena parcial de bits a la posicion decimal de
 //mi tabla de codigos base64
-int BinaryToDecimal(char* cadenaParcial)//char* cadenaParcial)
-{
+int BinaryToDecimal(char* cadenaParcial){
 	int cantBitsEncode64 = 6;
   	printf("Largo de la cadenaParcial:%d\n",(int)strlen(cadenaParcial));
 	int largoCadenaParcial = strlen(cadenaParcial);
@@ -140,15 +140,20 @@ void fileProcessing(char* nombre, char* buffer){
 }
 
 char* bufferOpen(int size){
-	char* auxBf = malloc(sizeof(char)*size +1);
+	printf("Open buffer[%d]\n",size);
+	char* auxBf = malloc(sizeof(char)*size);
 	if (auxBf != NULL)
+		auxBf[size-1] = '\0';
+		printf("Buffer%s\n",auxBf);
 		return auxBf;
 	fputs ("No se pudo obtener buffer.\n", stderr);
 	return NULL;
 }
 
 void bufferClose(char* bf){
-	free(bf);
+	//printf("Close buffer\n");
+	if(bf!=NULL)
+		free(bf);
 }
 
 
@@ -250,47 +255,33 @@ void setParametrosActivos(int argc, char *argv[], bool *oflag) {
 	}
 }
 
-int main (int argc, char *argv[]) {
-	/*char ejemplo[2] = "Ma";
-	char CadenaBit[24] = "";
-	for(unsigned int i=0; i<2; i++) {
-		CharToBinary(ejemplo[i], CadenaBit);
-	}
-
-	printf("El largo de CadenaBit es:%d\n", (int)strlen(CadenaBit));*/
-
-	/**
-	NOTA CRISTIAN: TE COMENTO LO TUYO PARA PODER PROBAR
-	LOS ARGUMENTOS REALES**/
-
-	/**
+bool activeParameter(int argc, char* argv[],const char * flagLetter, const char* action){
 	for (size_t i = 0; i < argc; i++){
-		printf("Argumentos[%d] :%s\n",(int)i,argv[i]);
+		if((strcmp(argv[i],flagLetter) == 0) || strcmp(argv[i], action) == 0) {
+			return true;
+		}
 	}
+	return false;
+}
 
-	//dado que tengo un archivo, obtengo la cadena de caracteres
-	int size = fileGetSize(argv[4]);
-	char* bf = bufferOpen(size);
-	//char* bf[size+1] = ""
-	bf[size] = '\0';
-	fileProcessing(argv[4],bf);
-	printf("El buffer es:%s\n",bf); //valgrind me tira lectura invalida aca
-	printf("Tamanio del buffer:%d\n",(int)strlen(bf));
-	//BinaryToDecimal(bf);
-	bufferClose(bf);
-	//BinaryToDecimal(&(CadenaBit[0]));
+void readSTDIN(char* bf,int size){
+	//if (!activeParameter(argc,argv,"i","--input")){
+		printf("Leyendo desde STDIN..\n");
+		//inputBuffer = bufferOpen(400);
+		printf("Cantidad de bytes leidos:%d\n",(int)read(0, bf, size));
+		printf("Esto es la entrada%s\n",bf);
+	//}
+}
+void encode(char* c1,char* c2){}
 
-	**/
-	//Cargo el buffer con posibles caracteres ingresados por Stdin
-	//char *buffer = NULL;
-	//setStdinBuffer(buffer);
-
-	//printf("A ver: %s", buffer);
-
-	char **bufferArchivoEntrada;
-	*bufferArchivoEntrada = NULL;
-	char *CadenaDecodificada = NULL;
-	bool oflag = false;
+int main (int argc, char *argv[]) {
+	char* inputBuffer = NULL;
+	bool encode64 = true; //Por defecto se encodifica
+	bool stdin = true;
+	bool stdoutB = true;
+	char* output = NULL;
+	char* outputFileName = NULL;
+	char* inputFileName = NULL;
 	int c;
 	while (1) {
 		static struct option long_options[] = {
@@ -301,56 +292,37 @@ int main (int argc, char *argv[]) {
 				{"action", optional_argument, 0, 'a'},
 				{0, 0, 0, 0}
 		};
+
+		//Si no espefica el input, leo desde el stdin
 		int option_index = 0;
  		c = getopt_long (argc, argv, "Vhi:o:a:",
  	   	long_options, &option_index);
 		if (c == -1)
 		break;
-
-		setParametrosActivos(argc, argv, &oflag);
-		switch (c) {
+				switch (c) {
 			case 'V':
 				version();
+
 				break;
 			case 'h':
 				help();
 				break;
 			case 'i':
-				leerArchivo(optarg, bufferArchivoEntrada);
+				//caso i y caso o lo meto en un funcion
+				stdin = false;
+				inputFileName = malloc(strlen(optarg)+1);
+				inputFileName[strlen(optarg)] = '\0';
+				strcat(inputFileName,optarg);
 				break;
 			case 'o':
-        		if(CadenaDecodificada != NULL) {
-					grabarArchivo(optarg, CadenaDecodificada);
-				}
-				//FALTA IMPLEMENTAR -i
-				//else if(CadenaCodificada != 0) {
-				//	grabarArchivo(optarg, CadenaCodificada);
-				//}
-				else {
-					printf("No hay informacion para persistir.\n");
-				}
+				stdoutB = false;
+				outputFileName = malloc(strlen(optarg)+1);
+				outputFileName[strlen(optarg)] = '\0';
+				strcat(outputFileName,optarg);
 				break;
 			case 'a':
-				if(optarg != 0) {
-					if(strcmp(optarg, "decode") == 0) {
-						//Se ingreso la informacion a ser procesada por medio de un archivo
-						if(*bufferArchivoEntrada != NULL) {
-							CadenaDecodificada = malloc(((strlen(*bufferArchivoEntrada)*sizeof(char)*6)/8)+1);
-							decode(*bufferArchivoEntrada, CadenaDecodificada);
-
-							//Si no se especifica un archivo de salida, entonces se muestra por stdout
-							if(!oflag) {
-								fputs(CadenaDecodificada, stdout);
-							}
-						}
-					} else if(strcmp(optarg, "encode") == 0) {
-						printf("Hay que codificar");
-					} else {
-						fputs ("No se reconoce el comando, por favor lea la ayuda.\n", stderr);
-					}
-				} else if (optarg == 0) {
-					//Por defecto codifica
-					printf("Hay que codificar");
+				if(strcmp(optarg,"decode") == 0){
+					encode64 = false;
 				}
         		break;
 			case '?':
@@ -360,10 +332,35 @@ int main (int argc, char *argv[]) {
 		}
 	}
 
-	//Libero recursos
-	if (*bufferArchivoEntrada != NULL) {
-		bufferClose(*bufferArchivoEntrada);
+	//llegado hasta aca el inputBuffer se leyo desde un archivo o desde stdin
+	if(stdin){
+		printf("Input:STDIN\n");
+		readSTDIN(inputBuffer,400);
+	}else{
+		printf("Input:%s\n",inputFileName);
+		leerArchivo(inputFileName,&inputBuffer);
 	}
 
+	output = bufferOpen(((strlen(inputBuffer)*sizeof(char)*6)/8) + 1);
+	if (encode64){
+		printf("Encode..\n");
+		//encode(inputBuffer,output);
+	}else{
+		printf("Decode..\n");
+		decode(inputBuffer,output);
+	}
+	//Definiendo la salida
+	if(stdoutB){
+		printf("Output:STDOUT\n");
+		fputs(output, stdout);
+	}else{
+		printf("Ouput:%s\n",outputFileName);
+		grabarArchivo(outputFileName, output);
+	}
+	//Libero recursos
+	bufferClose(inputBuffer);
+	bufferClose(outputFileName);
+	bufferClose(inputFileName);
+	bufferClose(output);
 	return 0;
 }
