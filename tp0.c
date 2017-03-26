@@ -141,7 +141,7 @@ void fileProcessing(char* nombre, char* buffer){
 	FILE* fp = fileOpen(nombre);
 	if (fp != NULL){
 		fileRead(fp, buffer);
-		
+
 		printf("DEspues del fileREad: %s", buffer);
 		fileClose(fp);
 	}
@@ -168,11 +168,11 @@ void PosicionToBinary(int posicion, char *CadenaBit) {
     {
     	//Las cadenas en base64 son de 6 bits, los dos primeros ceros no me interesan
     	if((j != 0) && (j != 1)) {
-    		cadenaAuxiliar[j-2] = ((posicion & (1 << i)) ? '1' : '0' );	
+    		cadenaAuxiliar[j-2] = ((posicion & (1 << i)) ? '1' : '0' );
     	}
     	j++;
     }
-    strcat(CadenaBit, cadenaAuxiliar);	
+    strcat(CadenaBit, cadenaAuxiliar);
 }
 
 int decodeBase64(char caracter) {
@@ -190,7 +190,7 @@ void decode(char *cadenaBase64, char *CadenaDecodificada) {
 	char *CadenaBits;
 	//Reservo memoria para almacenar la cadena binaria
 	CadenaBits = calloc(2, strlen(cadenaBase64)*sizeof(char)*6);
-	
+
 	//Traduzco cada caracter base64 a binario
 	for(unsigned int i=0; i<strlen(cadenaBase64); i++) {
 		char cadenaAuxiliar[6] = "";
@@ -205,7 +205,7 @@ void decode(char *cadenaBase64, char *CadenaDecodificada) {
 	while(i < strlen(CadenaBits)) {
 		for(unsigned int j=0; j<8; j++) {
 			cadenaAuxiliar[j] = CadenaBits[i];
-			i++;	
+			i++;
 		}
 		char c = strtol(cadenaAuxiliar, 0, 2);
 		if(strlen(&c) != 0) {
@@ -217,11 +217,11 @@ void decode(char *cadenaBase64, char *CadenaDecodificada) {
 
 void grabarArchivo(char *nombreArchivo, char* cadena) {
 	FILE *fp;
-	fp = fopen(nombreArchivo, "w+");        
+	fp = fopen(nombreArchivo, "w+");
 	if (fp == NULL) {
 		fputs ("Error abriendo el archivo.",stderr);
 		exit(1);
-	} 	
+	}
  	fputs(cadena, fp);
 	fclose (fp);
 }
@@ -242,17 +242,17 @@ void setStdinBuffer(char* buffer2) {
     printf("Size read: %d\n Len: %d\n", read, (int)len);
 }
 
-void leerArchivo(char* nombreArchivo, char *bf) {
+void leerArchivo(char* nombreArchivo, char** bf) {
 	//Dado que tengo un archivo, obtengo la cadena de caracteres
 	int size = fileGetSize(nombreArchivo);
-	bf = bufferOpen(size);
+	*bf = bufferOpen(size);
 	//char* bf[size+1] = ""
 	bf[size] = '\0';
-	fileProcessing(nombreArchivo, bf);
-	printf("El buffer essssssssss:%s\n", bf); //valgrind me tira lectura invalida aca
-	printf("Tamanio del buffer:%d\n", (int)strlen(bf));
+	fileProcessing(nombreArchivo, *bf);
+	printf("El buffer essssssssss:%s\n", *bf); //valgrind me tira lectura invalida aca
+	printf("Tamanio del buffer:%d\n", (int)strlen(*bf));
 	//BinaryToDecimal(bf);
-	
+
 }
 
 int main (int argc, char *argv[]) {
@@ -263,11 +263,11 @@ int main (int argc, char *argv[]) {
 	}
 
 	printf("El largo de CadenaBit es:%d\n", (int)strlen(CadenaBit));*/
-	
+
 	/**
 	NOTA CRISTIAN: TE COMENTO LO TUYO PARA PODER PROBAR
 	LOS ARGUMENTOS REALES**/
-	
+
 	/**
 	for (size_t i = 0; i < argc; i++){
 		printf("Argumentos[%d] :%s\n",(int)i,argv[i]);
@@ -292,7 +292,7 @@ int main (int argc, char *argv[]) {
 
 	//printf("A ver: %s", buffer);
 
-	char *bufferArchivoEntrada = NULL;
+	char **bufferArchivoEntrada;
 	char *CadenaDecodificada;
 	int c;
 	while (1) {
@@ -320,11 +320,11 @@ int main (int argc, char *argv[]) {
 			case 'i':
 				printf("Entre al i");
 				leerArchivo(optarg, bufferArchivoEntrada);
-						printf("FINAL: %s", bufferArchivoEntrada);
+						printf("FINAL: %s", *bufferArchivoEntrada);
 				break;
 			case 'o':
         		if(CadenaDecodificada != 0) {
-					grabarArchivo(optarg, CadenaDecodificada);	
+					grabarArchivo(optarg, CadenaDecodificada);
 				}
 				//FALTA IMPLEMENTAR -i
 				//else if(CadenaCodificada != 0) {
@@ -336,17 +336,17 @@ int main (int argc, char *argv[]) {
 				break;
 			case 'a':
 				printf("Entre al a");
-				printf("Buffer archivo entrada: %s", bufferArchivoEntrada);
+				printf("Buffer archivo entrada: %s", *bufferArchivoEntrada);
 				if(optarg != 0) {
 					if(strcmp(optarg, "decode") == 0) {
-						if(bufferArchivoEntrada != NULL) {
+						if(*bufferArchivoEntrada != NULL) {
 							//Se ingreso la informacion a ser procesada por medio de un archivo
-							CadenaDecodificada = calloc(1, ((strlen(bufferArchivoEntrada)*sizeof(char)*6)/8));
-							decode(bufferArchivoEntrada, CadenaDecodificada);
+							CadenaDecodificada = calloc(1, ((strlen(*bufferArchivoEntrada)*sizeof(char)*6)/8));
+							decode(*bufferArchivoEntrada, CadenaDecodificada);
 
 							printf("Texto decodificado: %s \n", CadenaDecodificada);
 						}
-						/**	
+						/**
 						//if(buffer != NULL) {
 							char buffer[365] = "TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlz"
 "IHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2Yg"
