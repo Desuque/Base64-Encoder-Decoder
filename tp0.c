@@ -102,10 +102,9 @@ int BinaryToDecimal(char* cadenaParcial)//char* cadenaParcial)
 FILE* fileOpen(char* nombre){
 	FILE* fp = fopen(nombre, "rb");
 	if(fp == NULL){
-		printf("El archivo no existe o no puede ser abierto.\n");
+		fputs ("El archivo no existe o no puede ser abierto.\n", stderr);
 		exit(1);
 	}
-	printf("Archivo '%s' abierto de manera exitosa.\n", nombre);
 	return fp;
 }
 
@@ -115,45 +114,36 @@ void fileClose(FILE* fp){
 }
 
 int fileGetSize(char* nombre){
-	printf("Obteniendo tamanio del archivo\n");
 	FILE* fp = fileOpen(nombre);
 	fseek(fp, 0L, SEEK_END);
 	int size = ftell(fp);
 	fseek(fp, 0L, SEEK_SET);
 	fileClose(fp);
-	printf("Size file:%d\n",size);
 	return size;
 }
 
 void fileRead(FILE* fp,char* buffer){
-	printf("Leyendo archivo..\n");
 	char caracter;
 	int pos = 0;
 	while((caracter = fgetc(fp)) != EOF){
 		buffer[pos] = caracter;
-		//printf("%c.",buffer[pos]);
 		pos++;
 	}
-	printf("\n");
-	printf("Se termino de leer archivo\n");
 }
 
 void fileProcessing(char* nombre, char* buffer){
 	FILE* fp = fileOpen(nombre);
 	if (fp != NULL){
 		fileRead(fp, buffer);
-
-		printf("DEspues del fileREad: %s", buffer);
 		fileClose(fp);
 	}
 }
 
 char* bufferOpen(int size){
-	printf("Estoy pidiendo:%d\n", (int)(sizeof(char)*size +1));
 	char* auxBf = malloc(sizeof(char)*size +1);
 	if (auxBf != NULL)
 		return auxBf;
-	printf("No se pudo obtener buffer..\n");
+	fputs ("No se pudo obtener buffer.\n", stderr);
 	return NULL;
 }
 
@@ -247,20 +237,14 @@ void leerArchivo(char* nombreArchivo, char** bf) {
 	//Dado que tengo un archivo, obtengo la cadena de caracteres
 	int size = fileGetSize(nombreArchivo);
 	*bf = bufferOpen(size);
-	//char* bf[size+1] = ""
 	bf[size] = '\0';
 	fileProcessing(nombreArchivo, *bf);
-	printf("El buffer essssssssss:%s\n", *bf); //valgrind me tira lectura invalida aca
-	printf("Tamanio del buffer:%d\n", (int)strlen(*bf));
-	//BinaryToDecimal(bf);
-
 }
 
 void setParametrosActivos(int argc, char *argv[], bool *oflag) {
 	//Seteo los parametros que estan activos
 	for (size_t i = 0; i < argc; i++){
-		if(argv[i] == "o" || argv[i] == "output") {
-			printf("Entre");
+		if((strcmp(argv[i], "-o") == 0) || strcmp(argv[i], "--output") == 0) {
 			*oflag = true;
 		}
 	}
@@ -354,7 +338,10 @@ int main (int argc, char *argv[]) {
 							CadenaDecodificada = calloc(1, ((strlen(*bufferArchivoEntrada)*sizeof(char)*6)/8));
 							decode(*bufferArchivoEntrada, CadenaDecodificada);
 
-							fputs (CadenaDecodificada, stdout);
+							//Si no se especifica un archivo de salida, entonces se muestra por stdout
+							if(!oflag) {
+								fputs (CadenaDecodificada, stdout);
+							}
 						}
 					} else if(strcmp(optarg, "encode") == 0) {
 						printf("Hay que codificar");
