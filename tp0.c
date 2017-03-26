@@ -50,7 +50,7 @@ void encodeBase64(int posicion) {
 int BinaryToDecimal(char* cadenaParcial)//char* cadenaParcial)
 {
 	int cantBitsEncode64 = 6;
-  printf("Largo de la cadenaParcial:%d\n",(int)strlen(cadenaParcial));
+  	printf("Largo de la cadenaParcial:%d\n",(int)strlen(cadenaParcial));
 	int largoCadenaParcial = strlen(cadenaParcial);
 	int cantidadCiclos = strlen(cadenaParcial)/cantBitsEncode64;
 	printf("cantidad de ciclos:%d\n", cantidadCiclos);
@@ -99,14 +99,12 @@ int BinaryToDecimal(char* cadenaParcial)//char* cadenaParcial)
 }
 
 FILE* fileOpen(char* nombre){
-	char modo[] = "rb"; //modo lectura binaria
-	FILE* fp =  fopen (nombre,modo);
+	FILE* fp = fopen(nombre, "rb");
 	if(fp == NULL){
-		printf("Error en abrir el archivo\n");
-		fclose(fp);
-		return NULL;
+		printf("El archivo no existe o no puede ser abierto.\n");
+		exit(1);
 	}
-	printf("Archivo '%s' abierto de manera exitosa\n", nombre);
+	printf("Archivo '%s' abierto de manera exitosa.\n", nombre);
 	return fp;
 }
 
@@ -138,10 +136,10 @@ void fileRead(FILE* fp,char cadena[]){
 	printf("Se termino de leer archivo\n");
 }
 
-void fileProcessing(char* nombre,char* buffer){
+void fileProcessing(char* nombre, char* buffer){
 	FILE* fp = fileOpen(nombre);
 	if (fp != NULL){
-		fileRead(fp,buffer);
+		fileRead(fp, buffer);
 		fileClose(fp);
 	}
 }
@@ -219,7 +217,7 @@ void grabarArchivo(char *nombreArchivo, char* cadena) {
 	fp = fopen(nombreArchivo, "w+");        
 	if (fp == NULL) {
 		fputs ("Error abriendo el archivo.",stderr);
-		exit (1);
+		exit(1);
 	} 	
  	fputs(cadena, fp);
 	fclose (fp);
@@ -239,6 +237,19 @@ void setStdinBuffer(char* buffer2) {
         printf("No line read...\n");
 
     printf("Size read: %d\n Len: %d\n", read, (int)len);
+}
+
+void leerArchivo(char* nombreArchivo, char *bf) {
+	//Dado que tengo un archivo, obtengo la cadena de caracteres
+	int size = fileGetSize(nombreArchivo);
+	bf = bufferOpen(size);
+	//char* bf[size+1] = ""
+	bf[size] = '\0';
+	fileProcessing(nombreArchivo, bf);
+	printf("El buffer es:%s\n", bf); //valgrind me tira lectura invalida aca
+	printf("Tamanio del buffer:%d\n", (int)strlen(bf));
+	//BinaryToDecimal(bf);
+	
 }
 
 int main (int argc, char *argv[]) {
@@ -270,22 +281,22 @@ int main (int argc, char *argv[]) {
 	//BinaryToDecimal(bf);
 	bufferClose(bf);
 	//BinaryToDecimal(&(CadenaBit[0]));
+
 	**/
-
-
 	//Cargo el buffer con posibles caracteres ingresados por Stdin
 	//char *buffer = NULL;
 	//setStdinBuffer(buffer);
 
 	//printf("A ver: %s", buffer);
 
+	char *bufferArchivoEntrada = NULL;
 	char *CadenaDecodificada;
 	int c;
 	while (1) {
 		static struct option long_options[] = {
 				{"version", no_argument, 0, 'V'},
 				{"help", no_argument, 0, 'h'},
-				{"input", optional_argument, 0, 'i'},
+				{"input", required_argument, 0, 'i'},
 				{"output", required_argument, 0, 'o'},
 				{"action", optional_argument, 0, 'a'},
 				{0, 0, 0, 0}
@@ -304,7 +315,7 @@ int main (int argc, char *argv[]) {
 				help();
 				break;
 			case 'i':
-				//TODO
+				leerArchivo(optarg, bufferArchivoEntrada);
 				break;
 			case 'o':
         		if(CadenaDecodificada != 0) {
@@ -352,11 +363,9 @@ int main (int argc, char *argv[]) {
 		}
 	}
 
-/**
 	//Libero recursos
-	if (buffer != NULL) {
-		free(buffer);
+	if (bufferArchivoEntrada != NULL) {
+		bufferClose(bufferArchivoEntrada);
 	}
-**/
 	return 0;
 }
