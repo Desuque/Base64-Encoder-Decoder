@@ -51,10 +51,8 @@ void encodeBase64(int posicion,char* output,int pos) {
 //mi tabla de codigos base64
 int BinaryToDecimal(char* cadenaParcial,char* output, int longitud){
 	int cantBitsEncode64 = 6;
-  //printf("Largo de la cadenaParcial:%d\n",(int)strlen(cadenaParcial));
 	int largoCadenaParcial = strlen(cadenaParcial);
 	int cantidadCiclos = strlen(cadenaParcial)/cantBitsEncode64;
-	//printf("cantidad de ciclos:%d\n", cantidadCiclos);
 	int codASCIIZero = 48;
 	int posicion;
 	int pos = 0;
@@ -62,12 +60,9 @@ int BinaryToDecimal(char* cadenaParcial,char* output, int longitud){
 		posicion = 0 ;
 		for(int j = 0 ; j < cantBitsEncode64 ; j++){
 			//se realiza un conversion directa, con '0' devuelve 48, por  eso se resta
-			//printf("pos:%d\n",j+i*cantBitsEncode64);
 			int aux = cadenaParcial[j+i*cantBitsEncode64] - codASCIIZero;
 			posicion = posicion << 1 | aux;
 		}
-		//printf("Decimal: %d\n", posicion);
-		//encodeBase64(posicion);
 		encodeBase64(posicion,output,pos);
 		pos++;
 	}
@@ -75,34 +70,25 @@ int BinaryToDecimal(char* cadenaParcial,char* output, int longitud){
 	//en caso de que sobre bits, recorro los bits que sobran y hago un segundo
 	//loop rellenando con 0
 	int bitsSobrantes = largoCadenaParcial%cantBitsEncode64;
-	//printf("cantidad de bits sobrantes:%d\n", bitsSobrantes);
 	if (bitsSobrantes != 0){
 		posicion = 0;
 		for (size_t i = largoCadenaParcial- bitsSobrantes; i < largoCadenaParcial; i++){
 			int aux = cadenaParcial[i] - codASCIIZero;
-			//printf("aux:%d\n",aux);
 			posicion = posicion << 1 | aux;
 		}
 		int cantidadDeBytesPorDecode = 4;
-		//printf("cantidadCiclos:%d\n",cantidadCiclos);
 		int cantidadDeLoopsCompletar4Bytes = longitud - (cantidadCiclos + 1);
-		//printf("Cantidad de loop's faltantes es:%d\n",cantidadDeLoopsCompletar4Bytes);
 		for (size_t i = 0; i < cantBitsEncode64 - bitsSobrantes; i++){
-			//printf("aux:%d\n",0);
 			posicion = posicion << 1 | 0;
 		}
 		if (posicion == 0){
 			posicion = 64;
 		}
-		//encodeBase64(posicion);
-		//printf("Outpostasasa1:%s\n",output);
 		encodeBase64(posicion,output,pos);
 		pos++;
 		posicion = 64;
 		for (size_t i = 0; i < cantidadDeLoopsCompletar4Bytes; i++) {
-			//encodeBase64(posicion);
 			encodeBase64(posicion,output,pos);
-			//printf("Outpostasasa1:%s\n",output);
 			pos++;
 		}
 	}
@@ -151,18 +137,15 @@ void fileProcessing(char* nombre, char* buffer){
 }
 
 char* bufferOpen(int size){
-	printf("Open buffer[%d]\n",size);
 	char* auxBf = malloc(sizeof(char)*size);
 	if (auxBf != NULL)
 		strcpy(auxBf,"");
-		printf("Buffer%s\n",auxBf);
 		return auxBf;
 	fputs ("No se pudo obtener buffer.\n", stderr);
 	return NULL;
 }
 
 void bufferClose(char* bf){
-	//printf("Close buffer\n");
 	if(bf!=NULL)
 		free(bf);
 }
@@ -183,7 +166,6 @@ void PosicionToBinary(int posicion, char *CadenaBit) {
 }
 
 int decodeBase64(char caracter) {
-	//REVISAR CASO DEL IGUAL, HACER CASO DE BORDE
 	char code[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 	for(unsigned int i=0; i<strlen(code); i++) {
 		if(caracter == code[i]) {
@@ -279,13 +261,9 @@ bool activeParameter(int argc, char* argv[],const char * flagLetter, const char*
 }
 
 void readSTDIN(char* bf,int size){
-	//if (!activeParameter(argc,argv,"i","--input")){
-		printf("Leyendo desde STDIN..\n");
-		//inputBuffer = bufferOpen(400);
-		printf("Cantidad de bytes leidos:%d\n",(int)read(0, bf, size)-1);
-		printf("Esto es la entrada%s\n",bf);
-	//}
+		read(0, bf, size);
 }
+
 int calculateLen(char* input){
 	int longitudBits = (strlen(input)-1)*8;
 	int longitud = longitudBits/6;
@@ -298,15 +276,12 @@ int calculateLen(char* input){
 }
 
 void encode(char* input,char* output){
-	printf("Strlen input:%d\n", (int)strlen(input));
 	int longitudBits = (strlen(input)-1)*8;
 	char* cadenaDeBits = bufferOpen(longitudBits);
 	for (size_t i = 0; i < strlen(input)-1 ; i++) {
 			CharToBinary(input[i],cadenaDeBits);
 	}
 	BinaryToDecimal(cadenaDeBits,output,calculateLen(input));
-	//bufferClose(cadenaDeBits);
-	printf("Asi quedo la salida:%s\n",output);
 }
 
 int main (int argc, char *argv[]) {
@@ -337,7 +312,6 @@ int main (int argc, char *argv[]) {
 				switch (c) {
 			case 'V':
 				version();
-
 				break;
 			case 'h':
 				help();
@@ -370,31 +344,24 @@ int main (int argc, char *argv[]) {
 	//llegado hasta aca el inputBuffer se leyo desde un archivo o desde stdin
 	if(stdin){
 		inputBuffer = bufferOpen(400);
-		printf("Input:STDIN\n");
 		readSTDIN(inputBuffer,400);
 	}else{
-		printf("Input:%s\n",inputFileName);
 		leerArchivo(inputFileName,&inputBuffer);
 	}
-
-
-
 	if (encode64){
-		printf("Encode..\n");
 		int len = calculateLen(inputBuffer);
 		output = bufferOpen(len+1);
-		memset(output, '\0', strlen(output)+1);
+		memset(output, '\0', strlen(output));
 		encode(inputBuffer,output);
 	}else{
-		printf("Decode..\n");
 		output = bufferOpen(((strlen(inputBuffer)*sizeof(char)*6)/8) + 1);
 		memset(output, '\0', strlen(output)+1);
 		decode(inputBuffer,output);
 	}
 	//Definiendo la salida
 	if(stdoutB){
-		printf("Output:STDOUT\n");
 		fputs(output, stdout);
+		printf("\n");
 	}else{
 		printf("Ouput:%s\n",outputFileName);
 		grabarArchivo(outputFileName, output);
