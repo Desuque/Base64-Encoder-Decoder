@@ -264,6 +264,13 @@ void readSTDIN(char* bf,int size){
 		read(0, bf, size);
 }
 
+
+void charCopy(char** ch1,char* ch2){
+	*ch1 = malloc(strlen(ch2)+1);
+	(*ch1)[strlen(ch2)] = '\0';
+	strcat(*ch1,ch2);
+}
+
 int calculateLen(char* input){
 	int longitudBits = (strlen(input)-1)*8;
 	int longitud = longitudBits/6;
@@ -317,17 +324,12 @@ int main (int argc, char *argv[]) {
 				help();
 				break;
 			case 'i':
-				//caso i y caso o lo meto en un funcion
 				stdin = false;
-				inputFileName = malloc(strlen(optarg)+1);
-				inputFileName[strlen(optarg)] = '\0';
-				strcat(inputFileName,optarg);
+				charCopy(&inputFileName,optarg);
 				break;
 			case 'o':
 				stdoutB = false;
-				outputFileName = malloc(strlen(optarg)+1);
-				outputFileName[strlen(optarg)] = '\0';
-				strcat(outputFileName,optarg);
+				charCopy(&outputFileName,optarg);
 				break;
 			case 'a':
 				if(strcmp(optarg,"decode") == 0){
