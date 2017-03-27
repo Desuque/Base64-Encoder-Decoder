@@ -172,6 +172,8 @@ int decodeBase64(char caracter) {
 			return i;
 			break;
 		}
+		//TODO
+		//SI NO EXISTE EL CARACTER TIENE QUE SALIR BIEN!!!
 	}
 }
 
