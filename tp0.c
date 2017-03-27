@@ -27,6 +27,7 @@ void version() {
 		);
 }
 
+/**
 //Convierto cada caracter que ingresa a una cadena de bits
 void CharToBinary(char c, char *CadenaBit)
 {
@@ -39,7 +40,7 @@ void CharToBinary(char c, char *CadenaBit)
     }
     strcat(CadenaBit, cadenaAuxiliar);
 }
-
+**/
 
 void encodeBase64(int posicion) {
 	char code[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
@@ -183,12 +184,13 @@ int decodeBase64(char caracter) {
 }
 
 void decode(char *cadenaBase64, char *CadenaDecodificada){
-	char *CadenaBits;
+	char *CadenaBits = NULL;
 	//Reservo memoria para almacenar la cadena binaria
-	CadenaBits = malloc(strlen(cadenaBase64)*sizeof(char)*6+1);
+	CadenaBits = malloc((strlen(cadenaBase64)-1)*sizeof(char)*6+1);
+	printf("Cadena base 64: %s", cadenaBase64);
 
 	//Traduzco cada caracter base64 a binario
-	for(unsigned int i=0; i<strlen(cadenaBase64); i++){
+	for(unsigned int i=0; i<strlen(cadenaBase64)-1; i++){
 		char cadenaAuxiliar[6] = "";
 		PosicionToBinary(decodeBase64(cadenaBase64[i]), cadenaAuxiliar);
 		strcat(CadenaBits, cadenaAuxiliar);
@@ -198,7 +200,8 @@ void decode(char *cadenaBase64, char *CadenaDecodificada){
 	char cadenaAuxiliar[8] = "";
 	int i = 0;
 	int k = 0;
-	while(i < strlen(CadenaBits)) {
+
+	while(i < (strlen(CadenaBits))) {
 		for(unsigned int j=0; j<8; j++) {
 			cadenaAuxiliar[j] = CadenaBits[i];
 			i++;
@@ -209,6 +212,7 @@ void decode(char *cadenaBase64, char *CadenaDecodificada){
 			k++;
 		}
 	}
+	CadenaDecodificada[strlen(CadenaDecodificada)] = '\0';
 }
 
 void grabarArchivo(char *nombreArchivo, char* cadena) {
@@ -354,6 +358,8 @@ int main (int argc, char *argv[]) {
 	}
 
 	output = bufferOpen(((strlen(inputBuffer)*sizeof(char)*6)/8) + 1);
+	memset(output, '\0', strlen(output)+1);
+
 	if (encode64){
 		printf("Encode..\n");
 		encode(inputBuffer,output);
