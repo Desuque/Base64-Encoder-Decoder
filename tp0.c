@@ -27,7 +27,7 @@ void version() {
 		);
 }
 
-/**
+
 //Convierto cada caracter que ingresa a una cadena de bits
 void CharToBinary(char c, char *CadenaBit)
 {
@@ -40,24 +40,24 @@ void CharToBinary(char c, char *CadenaBit)
     }
     strcat(CadenaBit, cadenaAuxiliar);
 }
-**/
 
-void encodeBase64(int posicion) {
+void encodeBase64(int posicion,char* output,int pos) {
 	char code[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 	char resultado = code[posicion];
-	printf("Encode: %c\n", resultado);
+	output[pos] = resultado;
 }
 
 //Convierto la cadena parcial de bits a la posicion decimal de
 //mi tabla de codigos base64
-int BinaryToDecimal(char* cadenaParcial){
+int BinaryToDecimal(char* cadenaParcial,char* output, int longitud){
 	int cantBitsEncode64 = 6;
-  	printf("Largo de la cadenaParcial:%d\n",(int)strlen(cadenaParcial));
+  //printf("Largo de la cadenaParcial:%d\n",(int)strlen(cadenaParcial));
 	int largoCadenaParcial = strlen(cadenaParcial);
 	int cantidadCiclos = strlen(cadenaParcial)/cantBitsEncode64;
-	printf("cantidad de ciclos:%d\n", cantidadCiclos);
+	//printf("cantidad de ciclos:%d\n", cantidadCiclos);
 	int codASCIIZero = 48;
 	int posicion;
+	int pos = 0;
 	for (int i = 0; i < cantidadCiclos; i++){
 		posicion = 0 ;
 		for(int j = 0 ; j < cantBitsEncode64 ; j++){
@@ -66,14 +66,16 @@ int BinaryToDecimal(char* cadenaParcial){
 			int aux = cadenaParcial[j+i*cantBitsEncode64] - codASCIIZero;
 			posicion = posicion << 1 | aux;
 		}
-		printf("Decimal: %d\n", posicion);
-		encodeBase64(posicion);
+		//printf("Decimal: %d\n", posicion);
+		//encodeBase64(posicion);
+		encodeBase64(posicion,output,pos);
+		pos++;
 	}
 
 	//en caso de que sobre bits, recorro los bits que sobran y hago un segundo
 	//loop rellenando con 0
 	int bitsSobrantes = largoCadenaParcial%cantBitsEncode64;
-	printf("cantidad de bits sobrantes:%d\n", bitsSobrantes);
+	//printf("cantidad de bits sobrantes:%d\n", bitsSobrantes);
 	if (bitsSobrantes != 0){
 		posicion = 0;
 		for (size_t i = largoCadenaParcial- bitsSobrantes; i < largoCadenaParcial; i++){
@@ -82,8 +84,9 @@ int BinaryToDecimal(char* cadenaParcial){
 			posicion = posicion << 1 | aux;
 		}
 		int cantidadDeBytesPorDecode = 4;
-		int cantidadDeLoopsCompletar4Bytes = cantidadDeBytesPorDecode - (cantidadCiclos + 1)%cantidadDeBytesPorDecode;
-		printf("Cantidad de loop's faltantes es:%d\n",cantidadDeLoopsCompletar4Bytes);
+		//printf("cantidadCiclos:%d\n",cantidadCiclos);
+		int cantidadDeLoopsCompletar4Bytes = longitud - (cantidadCiclos + 1);
+		//printf("Cantidad de loop's faltantes es:%d\n",cantidadDeLoopsCompletar4Bytes);
 		for (size_t i = 0; i < cantBitsEncode64 - bitsSobrantes; i++){
 			//printf("aux:%d\n",0);
 			posicion = posicion << 1 | 0;
@@ -91,12 +94,19 @@ int BinaryToDecimal(char* cadenaParcial){
 		if (posicion == 0){
 			posicion = 64;
 		}
-		encodeBase64(posicion);
+		//encodeBase64(posicion);
+		//printf("Outpostasasa1:%s\n",output);
+		encodeBase64(posicion,output,pos);
+		pos++;
 		posicion = 64;
 		for (size_t i = 0; i < cantidadDeLoopsCompletar4Bytes; i++) {
-			encodeBase64(posicion);
+			//encodeBase64(posicion);
+			encodeBase64(posicion,output,pos);
+			//printf("Outpostasasa1:%s\n",output);
+			pos++;
 		}
 	}
+	printf("\n");
   return 0;
 }
 
@@ -276,17 +286,27 @@ void readSTDIN(char* bf,int size){
 		printf("Esto es la entrada%s\n",bf);
 	//}
 }
+int calculateLen(char* input){
+	int longitudBits = (strlen(input)-1)*8;
+	int longitud = longitudBits/6;
+	if (longitud%4 != 0){
+		longitud = longitud +4;
+		longitud = longitud/4;
+		longitud = longitud*4;
+	}
+	return longitud;
+}
+
 void encode(char* input,char* output){
 	printf("Strlen input:%d\n", (int)strlen(input));
 	int longitudBits = (strlen(input)-1)*8;
-	int longitud = longitudBits/6;
-	printf("longitud:%d\n",longitud);
-	if (longitudBits%6 != 0){
-		printf("longitud sobra bits:%d\n",longitud);
-		longitud++;
+	char* cadenaDeBits = bufferOpen(longitudBits);
+	for (size_t i = 0; i < strlen(input)-1 ; i++) {
+			CharToBinary(input[i],cadenaDeBits);
 	}
-	longitud = longitud + (4-longitud%4);
-	printf("La longitud:%d\n",longitud );
+	BinaryToDecimal(cadenaDeBits,output,calculateLen(input));
+	//bufferClose(cadenaDeBits);
+	printf("Asi quedo la salida:%s\n",output);
 }
 
 int main (int argc, char *argv[]) {
@@ -357,14 +377,18 @@ int main (int argc, char *argv[]) {
 		leerArchivo(inputFileName,&inputBuffer);
 	}
 
-	output = bufferOpen(((strlen(inputBuffer)*sizeof(char)*6)/8) + 1);
-	memset(output, '\0', strlen(output)+1);
+
 
 	if (encode64){
 		printf("Encode..\n");
+		int len = calculateLen(inputBuffer);
+		output = bufferOpen(len+1);
+		memset(output, '\0', strlen(output)+1);
 		encode(inputBuffer,output);
 	}else{
 		printf("Decode..\n");
+		output = bufferOpen(((strlen(inputBuffer)*sizeof(char)*6)/8) + 1);
+		memset(output, '\0', strlen(output)+1);
 		decode(inputBuffer,output);
 	}
 	//Definiendo la salida
