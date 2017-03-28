@@ -76,7 +76,6 @@ int BinaryToDecimal(char* cadenaParcial,char* output, int longitud){
 			int aux = cadenaParcial[i] - codASCIIZero;
 			posicion = posicion << 1 | aux;
 		}
-		int cantidadDeBytesPorDecode = 4;
 		int cantidadDeLoopsCompletar4Bytes = longitud - (cantidadCiclos + 1);
 		for (size_t i = 0; i < cantBitsEncode64 - bitsSobrantes; i++){
 			posicion = posicion << 1 | 0;
@@ -172,9 +171,9 @@ int decodeBase64(char caracter) {
 			return i;
 			break;
 		}
-		//TODO
-		//SI NO EXISTE EL CARACTER TIENE QUE SALIR BIEN!!!
+		return 1;
 	}
+	return 0;
 }
 
 void decode(char *cadenaBase64, char *CadenaDecodificada){
@@ -220,21 +219,6 @@ void grabarArchivo(char *nombreArchivo, char* cadena) {
 	fclose (fp);
 }
 
-void setStdinBuffer(char* buffer2) {
-    char *buffer = NULL;
-    int read;
-    long unsigned int len;
-    read = getline(&buffer, &len, stdin);
-    if (-1 != read) {
-    	buffer2 = calloc(1, strlen(buffer));
-    	strcpy(buffer2, buffer);
-        puts(buffer);
-    }
-    else
-        printf("No line read...\n");
-
-    printf("Size read: %d\n Len: %d\n", read, (int)len);
-}
 
 void leerArchivo(char* nombreArchivo, char** bf) {
 	//Dado que tengo un archivo, obtengo la cadena de caracteres
@@ -247,14 +231,6 @@ void leerArchivo(char* nombreArchivo, char** bf) {
 	fileProcessing(nombreArchivo, *bf);
 }
 
-void setParametrosActivos(int argc, char *argv[], bool *oflag) {
-	//Seteo los parametros que estan activos
-	for (size_t i = 0; i < argc; i++){
-		if((strcmp(argv[i], "-o") == 0) || strcmp(argv[i], "--output") == 0) {
-			*oflag = true;
-		}
-	}
-}
 
 bool activeParameter(int argc, char* argv[],const char * flagLetter, const char* action){
 	for (size_t i = 0; i < argc; i++){
@@ -299,7 +275,7 @@ void encode(char* input,char* output){
 int main (int argc, char *argv[]) {
 	char* inputBuffer = NULL;
 	bool encode64 = true; //Por defecto se encodifica
-	bool stdin = true;
+	bool stdinB = true;
 	bool stdoutB = true;
 	char* output = NULL;
 	char* outputFileName = NULL;
@@ -329,7 +305,7 @@ int main (int argc, char *argv[]) {
 				help();
 				break;
 			case 'i':
-				stdin = false;
+				stdinB = false;
 				charCopy(&inputFileName,optarg);
 				break;
 			case 'o':
@@ -349,7 +325,7 @@ int main (int argc, char *argv[]) {
 	}
 
 	//llegado hasta aca el inputBuffer se leyo desde un archivo o desde stdin
-	if(stdin){
+	if(stdinB){
 		inputBuffer = bufferOpen(400);
 		readSTDIN(inputBuffer,400);
 	}else{
