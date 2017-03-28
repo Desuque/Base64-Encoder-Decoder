@@ -21,6 +21,8 @@
 % Paquete para definir el idioma usado.
 \usepackage[spanish]{babel}
 
+%Paquete para poder insetar código de programación
+\usepackage{listings}
 
 % Título principal del documento.
 \title{		\textbf{Trabajo Práctico #0: Infraestructura básica}}
@@ -28,7 +30,7 @@
 % Información sobre los autores.
 \author{	Leandro Huemul Desuque, \textit{Padrón Nro. 95836}                     \\
             \texttt{ desuqueleandro@gmail.com }                                              \\
-            Cristian, \textit{Padrón Nro. 94719}                     \\
+            Cristian Nicolas Gonzalez, \textit{Padrón Nro. 94719}                     \\
             \texttt{ cristian3629@mail.com }                                              \\[2.5ex]
             \normalsize{1er. Cuatrimestre de 2017}                       \\
             \normalsize{66.20 Organización de Computadoras}                             \\
@@ -39,6 +41,8 @@
 
 
 \begin{document}
+
+
 
 % Inserta el título.
 \maketitle
@@ -152,8 +156,185 @@ Los argumentos utilizados para la compilación son los siguientes:
 \item[-I] Agrega el directorio especificado a la lista de directorios buscados para los archivos header
 \end{description}
 
+
+Los argumentos para la generación del código assembly con los siguientes:
+
+
+\begin{description}
+	\item[-Wall] Activa los mensajes de warning.
+	
+	\item[-std=c99] Se selecciona el estándar C99.
+	
+	\item[-O0] No se aplica optimizaciones por parte del compilador
+	
+	\item[-S]  detiene al compilador luego de generar el assembly.
+	
+	\item[-mrnames] indica al compilador que
+	genere la salida utilizando nombre de registro en lugar
+	de número de registro
+	
+	
+\end{description}
+
+
+
 \section{Resultados}
-FALTA, TODO.
+
+\subsection{Código Assembly}
+Acá tenemos el código assembly generado desde el emulador gxemul:
+\begin{lstlisting}
+	.file	1 "tp0.c"
+.section .mdebug.abi32
+.previous
+.abicalls
+.rdata
+.align	2
+$LC0:
+.ascii	"Usage:\n"
+.ascii	" tp0 -h\n"
+.ascii	" tp0 -V\n"
+.ascii	" tp0 [options]\n"
+.ascii	"Options:\n"
+.ascii	" -V, --version\t\tPrint version and quit.\n"
+.ascii	" -h, --help\t\tPrint this information.\n"
+.ascii	" -i, --input\t\tLocation of the input file.\n"
+.ascii	" -o, --output\t\tLocation of the output file.\n"
+.ascii	" -a, --action\t\tProgram action: encode (default) or dec"
+.ascii	"ode.\n"
+.ascii	"Examples:\n"
+.ascii	" tp0 -a encode -i ~/input -o ~/output\n"
+.ascii	" tp0 -a decode\n\000"
+.text
+.align	2
+.globl	help
+.ent	help
+help:
+.frame	$fp,40,$ra		# vars= 0, regs= 3/0, args= 16, extra= 8
+.mask	0xd0000000,-8
+.fmask	0x00000000,0
+.set	noreorder
+.cpload	$t9
+.set	reorder
+subu	$sp,$sp,40
+.cprestore 16
+sw	$ra,32($sp)
+sw	$fp,28($sp)
+sw	$gp,24($sp)
+move	$fp,$sp
+la	$a0,$LC0
+la	$t9,printf
+jal	$ra,$t9
+move	$sp,$fp
+lw	$ra,32($sp)
+lw	$fp,28($sp)
+addu	$sp,$sp,40
+j	$ra
+.end	help
+.size	help, .-help
+.rdata
+.align	2
+$LC1:
+.ascii	"Encoder/Decoder Base64\n"
+.ascii	"66.20 Organizacion de Computadoras FIUBA\n\000"
+.text
+.align	2
+.globl	version
+.ent	version
+version:
+.frame	$fp,40,$ra		# vars= 0, regs= 3/0, args= 16, extra= 8
+.mask	0xd0000000,-8
+.fmask	0x00000000,0
+.set	noreorder
+.cpload	$t9
+.set	reorder
+subu	$sp,$sp,40
+.cprestore 16
+sw	$ra,32($sp)
+sw	$fp,28($sp)
+sw	$gp,24($sp)
+move	$fp,$sp
+la	$a0,$LC1
+	la	$t9,printf
+jal	$ra,$t9
+move	$sp,$fp
+lw	$ra,32($sp)
+lw	$fp,28($sp)
+addu	$sp,$sp,40
+j	$ra
+.end	version
+.size	version, .-version
+.rdata
+.align	2
+$LC2:
+.ascii	"\000"
+.space	7
+.text
+.align	2
+.globl	CharToBinary
+.ent	CharToBinary
+CharToBinary:
+.frame	$fp,72,$ra		# vars= 32, regs= 3/0, args= 16, extra= 8
+.mask	0xd0000000,-8
+.fmask	0x00000000,0
+.set	noreorder
+.cpload	$t9
+.set	reorder
+subu	$sp,$sp,72
+.cprestore 16
+sw	$ra,64($sp)
+sw	$fp,60($sp)
+sw	$gp,56($sp)
+move	$fp,$sp
+move	$v0,$a0
+sw	$a1,76($fp)
+
+\end{lstlisting}
+
+\subsection{Pruebas}
+\texttt{./tp0\\
+Man\\
+TWFu\\
+}\\
+\texttt{./tp0\\
+M\\
+TQ==\\
+}\\
+\texttt{./tp0\\
+Ma\\
+TWE=\\
+}\\
+\texttt{./tp0\\
+any carnal pleasure.\\
+YW55IGNhcm5hbCBwbGVhc3VyZS4=\\
+}
+\\
+\texttt{./tp0\\
+	any carnal pleasure\\
+	YW55IGNhcm5hbCBwbGVhc3VyZQ==\\
+}
+\\
+
+\texttt{./tp0\\
+any carnal pleasur\\
+YW55IGNhcm5hbCBwbGVhc3Vy\
+}
+\\ 
+\texttt{./tp0\\
+	any carnal pleasu\\
+	YW55IGNhcm5hbCBwbGVhc3U=\
+}
+\\
+\texttt{./tp0\\
+	any carnal pleas\\
+	YW55IGNhcm5hbCBwbGVhcw==\
+}
+\\
+
+\texttt{./tp0 -i emptyFile.txt\\
+	\\
+}
+\\
+
 
 \section{Conclusiones}
 FALTA, TODO.
