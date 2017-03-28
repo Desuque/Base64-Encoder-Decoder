@@ -167,27 +167,35 @@ void PosicionToBinary(int posicion, char *CadenaBit) {
 
 int decodeBase64(char caracter) {
 	char code[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+	int posicion = -1;
 	for(unsigned int i=0; i<strlen(code); i++) {
 		if(caracter == code[i]) {
-			return i;
-			break;
+			posicion = i;
 		}
-		return 1;
 	}
-	return 0;
+	return posicion;
 }
 
 void decode(char *cadenaBase64, char *CadenaDecodificada){
 	char *CadenaBits = NULL;
 	//Reservo memoria para almacenar la cadena binaria
 	CadenaBits = malloc((strlen(cadenaBase64)-1)*sizeof(char)*6+1);
-	printf("Cadena base 64: %s", cadenaBase64);
 
 	//Traduzco cada caracter base64 a binario
 	for(unsigned int i=0; i<strlen(cadenaBase64)-1; i++){
 		char cadenaAuxiliar[6] = "";
-		PosicionToBinary(decodeBase64(cadenaBase64[i]), cadenaAuxiliar);
-		strcat(CadenaBits, cadenaAuxiliar);
+		int posicion = decodeBase64(cadenaBase64[i]);
+		if(posicion != -1) {
+			PosicionToBinary(posicion, cadenaAuxiliar);
+			strcat(CadenaBits, cadenaAuxiliar);	
+		}
+		else {
+			//Salio algo mal, devolvamos la memoria que pedimos :)
+			free(CadenaBits);
+			fputs ("Caracter erroneo durante la decodificacion.\n", stderr);
+			exit(1);
+		}
+		
 	}
 
 	//Traduzco la cadena binaria a texto
