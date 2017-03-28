@@ -45,7 +45,6 @@ void encodeBase64(int posicion,char* output,int pos) {
 	char code[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 	char resultado = code[posicion];
 	output[pos] = resultado;
-	//printf("output:%s\n",output);
 }
 
 //Convierto la cadena parcial de bits a la posicion decimal de
@@ -78,7 +77,6 @@ int BinaryToDecimal(char* cadenaParcial,char* output, int longitud){
 			posicion = posicion << 1 | aux;
 		}
 		int cantidadDeLoopsCompletar4Bytes = longitud - (cantidadCiclos + 1);
-    printf("cantidadDeLoopsCompletar4Bytes:%d",cantidadDeLoopsCompletar4Bytes);
 		for (size_t i = 0; i < cantBitsEncode64 - bitsSobrantes; i++){
 			posicion = posicion << 1 | 0;
 		}
