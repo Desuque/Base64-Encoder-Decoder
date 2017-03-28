@@ -239,6 +239,9 @@ void setStdinBuffer(char* buffer2) {
 void leerArchivo(char* nombreArchivo, char** bf) {
 	//Dado que tengo un archivo, obtengo la cadena de caracteres
 	int size = fileGetSize(nombreArchivo);
+	if (size == 0){
+		exit(0);
+	}
 	*bf = bufferOpen(size);
 	bf[size] = '\0';
 	fileProcessing(nombreArchivo, *bf);
