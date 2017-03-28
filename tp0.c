@@ -231,18 +231,8 @@ void leerArchivo(char* nombreArchivo, char** bf) {
 	fileProcessing(nombreArchivo, *bf);
 }
 
-
-bool activeParameter(int argc, char* argv[],const char * flagLetter, const char* action){
-	for (size_t i = 0; i < argc; i++){
-		if((strcmp(argv[i],flagLetter) == 0) || strcmp(argv[i], action) == 0) {
-			return true;
-		}
-	}
-	return false;
-}
-
 void readSTDIN(char* bf,int size){
-		read(0, bf, size);
+	read(0, bf, size);
 }
 
 

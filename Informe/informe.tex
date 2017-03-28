@@ -115,35 +115,35 @@ La documentacion de las funciones se detalla por orden de aparición en el código
 \subsubsection{\texttt{grabarArchivo}}
 \texttt{grabarArchivo} guarda la información procesada en un archivo de salida.
 
-\subsubsection{\texttt{setStdinBuffer}}
-\texttt{setStdinBuffer} reserva espacio en memoria para almacenar la información ingresada por entrada estandar (STDIN).
+\subsubsection{\texttt{leerArchivo}}
+\texttt{leerArchivo} obtiene el tamaño del archivo, se encarga de abrir el buffer y de procesarlo.
 
-\subsubsection{\texttt{TODO}}
-\texttt{TODO} es una funció
+\subsubsection{\texttt{readSTDIN}}
+\texttt{readSTDIN} lee la cadena de entrada estandar STDIN.
 
-\subsubsection{\texttt{TODO}}
-\texttt{TODO} es una función
+\subsubsection{\texttt{charCopy}}
+\texttt{charCopy} copia cadenas de caracteres.
 
-\subsubsection{\texttt{TODO}}
-\texttt{TODO} es una funció
+\subsubsection{\texttt{calculateLen}}
+\texttt{calculateLen} calcula la longitud de una cadena de caracteres que previamente venía en formato de bits.
+
+\subsubsection{\texttt{encode}}
+\texttt{encode} se encarga de convertir cualquier caracter a binario, para luego convertirlo en la posición de codificación en la tabla de códigos base 64.
 
 \subsubsection{\texttt{Especificaciones}}
 
-%\\begin{figure}[!htp]
-%\\begin{center}
-%\\includegraphics[width=0.4\textwidth]{imagenStack.eps}
-%\\end{center}
-%\\caption{Stack de la función vecinos} \label{fig:stack}
-%\\end{figure}
+El funcionamiento del algoritmo de encoding/decoding es el siguiente:
 
-FALTA, TODO.
+* Para codificar:
+Se lee un caracter, el cual se convierte a su representación binaria. La misma se divide en cadenas de 6 bits, los cuales se transforman en su representación numérica. Esta última representación se compara con una tabla de códigos que no es más que todas las posibles secuencias de caracteres que puede tomar un texto en base 64.
+
+* Para decodificar:
+El camino es análogo a la codificación, se lee un caracterer codificado, el cual se transforma a su representación binaria. Éste y los demás caracteres se unen en una nueva cadena binaria, la cual se divide en subcadenas de 8 bits. Estas subcadenas se convierten a representación ASCI obteniendo el texto decodificado.
 
 \subsection{Dificultades}
-FALTA, TODO.
+Se podría remarcar el tiempo de aprendizaje de las nuevas herramientas, aunque no se encontraron grandes dificultades en el desarrollo del trabajo.
 
 \section{Compilación}
-FALTA, TODO.
-
 Los argumentos utilizados para la compilación son los siguientes:
 
 \begin{description}
@@ -156,9 +156,7 @@ Los argumentos utilizados para la compilación son los siguientes:
 \item[-I] Agrega el directorio especificado a la lista de directorios buscados para los archivos header
 \end{description}
 
-
 Los argumentos para la generación del código assembly con los siguientes:
-
 
 \begin{description}
 	\item[-Wall] Activa los mensajes de warning.
@@ -173,178 +171,80 @@ Los argumentos para la generación del código assembly con los siguientes:
 	genere la salida utilizando nombre de registro en lugar
 	de número de registro
 	
-	
 \end{description}
-
-
 
 \section{Resultados}
 
 \subsection{Código Assembly}
-Acá tenemos el código assembly generado desde el emulador gxemul:
-\begin{lstlisting}
-	.file	1 "tp0.c"
-.section .mdebug.abi32
-.previous
-.abicalls
-.rdata
-.align	2
-$LC0:
-.ascii	"Usage:\n"
-.ascii	" tp0 -h\n"
-.ascii	" tp0 -V\n"
-.ascii	" tp0 [options]\n"
-.ascii	"Options:\n"
-.ascii	" -V, --version\t\tPrint version and quit.\n"
-.ascii	" -h, --help\t\tPrint this information.\n"
-.ascii	" -i, --input\t\tLocation of the input file.\n"
-.ascii	" -o, --output\t\tLocation of the output file.\n"
-.ascii	" -a, --action\t\tProgram action: encode (default) or dec"
-.ascii	"ode.\n"
-.ascii	"Examples:\n"
-.ascii	" tp0 -a encode -i ~/input -o ~/output\n"
-.ascii	" tp0 -a decode\n\000"
-.text
-.align	2
-.globl	help
-.ent	help
-help:
-.frame	$fp,40,$ra		# vars= 0, regs= 3/0, args= 16, extra= 8
-.mask	0xd0000000,-8
-.fmask	0x00000000,0
-.set	noreorder
-.cpload	$t9
-.set	reorder
-subu	$sp,$sp,40
-.cprestore 16
-sw	$ra,32($sp)
-sw	$fp,28($sp)
-sw	$gp,24($sp)
-move	$fp,$sp
-la	$a0,$LC0
-la	$t9,printf
-jal	$ra,$t9
-move	$sp,$fp
-lw	$ra,32($sp)
-lw	$fp,28($sp)
-addu	$sp,$sp,40
-j	$ra
-.end	help
-.size	help, .-help
-.rdata
-.align	2
-$LC1:
-.ascii	"Encoder/Decoder Base64\n"
-.ascii	"66.20 Organizacion de Computadoras FIUBA\n\000"
-.text
-.align	2
-.globl	version
-.ent	version
-version:
-.frame	$fp,40,$ra		# vars= 0, regs= 3/0, args= 16, extra= 8
-.mask	0xd0000000,-8
-.fmask	0x00000000,0
-.set	noreorder
-.cpload	$t9
-.set	reorder
-subu	$sp,$sp,40
-.cprestore 16
-sw	$ra,32($sp)
-sw	$fp,28($sp)
-sw	$gp,24($sp)
-move	$fp,$sp
-la	$a0,$LC1
-	la	$t9,printf
-jal	$ra,$t9
-move	$sp,$fp
-lw	$ra,32($sp)
-lw	$fp,28($sp)
-addu	$sp,$sp,40
-j	$ra
-.end	version
-.size	version, .-version
-.rdata
-.align	2
-$LC2:
-.ascii	"\000"
-.space	7
-.text
-.align	2
-.globl	CharToBinary
-.ent	CharToBinary
-CharToBinary:
-.frame	$fp,72,$ra		# vars= 32, regs= 3/0, args= 16, extra= 8
-.mask	0xd0000000,-8
-.fmask	0x00000000,0
-.set	noreorder
-.cpload	$t9
-.set	reorder
-subu	$sp,$sp,72
-.cprestore 16
-sw	$ra,64($sp)
-sw	$fp,60($sp)
-sw	$gp,56($sp)
-move	$fp,$sp
-move	$v0,$a0
-sw	$a1,76($fp)
-
-\end{lstlisting}
+Se adjunta una porción del código MIPS al final del informe.
 
 \subsection{Pruebas}
+A continuación se muestran las pruebas realizadas con sus respectivas salidas por consola y/o archivos.
+
 \texttt{./tp0\\
 Man\\
 TWFu\\
-}\\
+}
+
 \texttt{./tp0\\
 M\\
 TQ==\\
-}\\
+}
+
 \texttt{./tp0\\
 Ma\\
 TWE=\\
-}\\
+}
+
 \texttt{./tp0\\
 any carnal pleasure.\\
 YW55IGNhcm5hbCBwbGVhc3VyZS4=\\
 }
-\\
+
 \texttt{./tp0\\
 	any carnal pleasure\\
 	YW55IGNhcm5hbCBwbGVhc3VyZQ==\\
 }
-\\
 
 \texttt{./tp0\\
 any carnal pleasur\\
-YW55IGNhcm5hbCBwbGVhc3Vy\
-}\\ 
+YW55IGNhcm5hbCBwbGVhc3Vy\\
+}
+
 \texttt{./tp0\\
 	any carnal pleasu\\
-	YW55IGNhcm5hbCBwbGVhc3U=\
-}\\
+	YW55IGNhcm5hbCBwbGVhc3U=\\
+}
+
 \texttt{./tp0\\
 	any carnal pleas\\
-	YW55IGNhcm5hbCBwbGVhcw==\
-}\\
+	YW55IGNhcm5hbCBwbGVhcw==\\
+}
 
 \texttt{./tp0 -i emptyFile.txt\\
 	\\
-}\\
-\texttt{./tp0 -i example1-encode.txt\\
-TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlzIHNpbmd1bGFy\\
-IHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2YgdGhlIG1pbmQsIHRoYXQgYnkgYS\\
-BwZXJzZXZlcmFuY2Ugb2YgZGVsaWdodCBpbiB0aGUgY29udGludWVkIGFuZCBpbmRlZmF0aWdhYmxlIGdlbmVyYXRpb2\\
-4gb2Yga25vd2xlZGdlLCBleGNlZWRzIHRoZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=\\
-}\\
+}
 
+\texttt{./tp0 -i example1-encode.txt\\
+TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ\\
+1dCBieSB0aGlzIHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLC\\
+B3aGljaCBpcyBhIGx1c3Qgb2YgdGhlIG1pbmQsIHRoYXQgYnkgYSBwZXJzZXZlc\\
+mFuY2Ugb2YgZGVsaWdodCBpbiB0aGUgY29udGludWVkIGFuZCBpbmRlZmF0aWdh\\
+YmxlIGdlbmVyYXRpb24gb2Yga25vd2xlZGdlLCBleGNlZWRzIHRoZSBzaG9ydCB\\
+2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=\\
+}
 
 \section{Conclusiones}
-FALTA, TODO.
+Luego de ejecutar ambas versiones, tanto la realizada con compilación normal como la realizada sobre el emulador, podemos concluir que se han comprendido los usos generales de las herramientas propuestas por la materia y se han afianzado las técnicas de programación necesarias para resolver este tipo de problemas.
 
 % Citas bibliográficas.
 \begin{thebibliography}{99}
 
 \bibitem{GXemul} Sitio web de GXemul http://gxemul.sourceforge.net/
+
+\bibitem{Manual getopt} Sitio web de GNU https://www.gnu.org/
+
+\bibitem{Wikipedia} Base 64 https://en.wikipedia.org/wiki/Base64
 
 \end{thebibliography}
 
