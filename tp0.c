@@ -45,6 +45,7 @@ void encodeBase64(int posicion,char* output,int pos) {
 	char code[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 	char resultado = code[posicion];
 	output[pos] = resultado;
+	//printf("output:%s\n",output);
 }
 
 //Convierto la cadena parcial de bits a la posicion decimal de
@@ -77,6 +78,7 @@ int BinaryToDecimal(char* cadenaParcial,char* output, int longitud){
 			posicion = posicion << 1 | aux;
 		}
 		int cantidadDeLoopsCompletar4Bytes = longitud - (cantidadCiclos + 1);
+    printf("cantidadDeLoopsCompletar4Bytes:%d",cantidadDeLoopsCompletar4Bytes);
 		for (size_t i = 0; i < cantBitsEncode64 - bitsSobrantes; i++){
 			posicion = posicion << 1 | 0;
 		}
@@ -91,7 +93,6 @@ int BinaryToDecimal(char* cadenaParcial,char* output, int longitud){
 			pos++;
 		}
 	}
-	printf("\n");
   return 0;
 }
 
@@ -138,7 +139,7 @@ void fileProcessing(char* nombre, char* buffer){
 char* bufferOpen(int size){
 	char* auxBf = malloc(sizeof(char)*size);
 	if (auxBf != NULL)
-		strcpy(auxBf,"");
+		memset(auxBf,'\0',size);
 		return auxBf;
 	fputs ("No se pudo obtener buffer.\n", stderr);
 	return NULL;
@@ -226,8 +227,7 @@ void leerArchivo(char* nombreArchivo, char** bf) {
 	if (size == 0){
 		exit(0);
 	}
-	*bf = bufferOpen(size);
-	bf[size] = '\0';
+	*bf = bufferOpen(size+1);
 	fileProcessing(nombreArchivo, *bf);
 }
 
@@ -263,10 +263,11 @@ int calculateLen(char* input){
 	return longitud;
 }
 
-void encode(char* input,char* output){
-	int longitudBits = (strlen(input)-1)*8;
+void encode(char* input,char* output,int flag){
+	int len = strlen(input);
+	int longitudBits = (len-1)*8;
 	char* cadenaDeBits = bufferOpen(longitudBits);
-	for (size_t i = 0; i < strlen(input)-1 ; i++) {
+	for (size_t i = 0; i < len - flag; i++) {
 			CharToBinary(input[i],cadenaDeBits);
 	}
 	BinaryToDecimal(cadenaDeBits,output,calculateLen(input));
@@ -325,9 +326,11 @@ int main (int argc, char *argv[]) {
 	}
 
 	//llegado hasta aca el inputBuffer se leyo desde un archivo o desde stdin
+	int flag = 0;
 	if(stdinB){
 		inputBuffer = bufferOpen(400);
 		readSTDIN(inputBuffer,400);
+		flag = 1;
 	}else{
 		leerArchivo(inputFileName,&inputBuffer);
 	}
@@ -335,7 +338,7 @@ int main (int argc, char *argv[]) {
 		int len = calculateLen(inputBuffer);
 		output = bufferOpen(len+1);
 		memset(output, '\0', strlen(output));
-		encode(inputBuffer,output);
+		encode(inputBuffer,output,flag);
 	}else{
 		output = bufferOpen(((strlen(inputBuffer)*sizeof(char)*6)/8) + 1);
 		memset(output, '\0', strlen(output)+1);
@@ -346,7 +349,6 @@ int main (int argc, char *argv[]) {
 		fputs(output, stdout);
 		printf("\n");
 	}else{
-		printf("Ouput:%s\n",outputFileName);
 		grabarArchivo(outputFileName, output);
 	}
 	//Libero recursos
